@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Crear Habitación</h2>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <label>Número</label>
+        <input type="text" name="numero" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Piso</label>
+        <input type="number" name="piso" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Estado</label>
+        <select name="estado" class="form-control">
+            <option value="disponible">Disponible</option>
+            <option value="ocupada">Ocupada</option>
+            <option value="mantenimiento">Mantenimiento</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Tipo de Habitación</label>
+        <select name="tipo_habitacion_id" class="form-control">
+            {% for t in tipos %}
+                <option value="{{ t.id }}">{{ t.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button class="btn btn-success">Guardar</button>
+    <a href="/habitaciones" class="btn btn-secondary">Cancelar</a>
+
+</form>
+
+{% endblock %}

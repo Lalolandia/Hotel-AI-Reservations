@@ -12,8 +12,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # IMPORTANTE: importar modelos aquí, dentro de la función
     with app.app_context():
         from app import models
+        from app.routes.habitacion_routes import habitacion_bp
+
+        app.register_blueprint(habitacion_bp)
 
     return app
