@@ -1,29 +1,158 @@
 {% extends 'base.html' %}
+{% block title %}Crear cuenta — HotelAI{% endblock %}
+
 {% block content %}
-<h2>Registro</h2>
-<form method="post">
-  {{ form.hidden_tag() }}
-  <div class="mb-3">
-    {{ form.nombre.label }} {{ form.nombre(class="form-control") }}
+<div class="auth-page">
+  <!-- Decorative side -->
+  <div class="auth-deco">
+    <div class="auth-deco-overlay"></div>
+    <div class="auth-deco-content">
+      <div class="brand mb-4">
+        <span class="brand-hotel">Hotel</span><span class="brand-ai">AI</span>
+      </div>
+      <h2>Únete a<br><em>la experiencia</em></h2>
+      <p>Crea tu cuenta y empieza a reservar habitaciones de lujo con recomendaciones personalizadas por IA.</p>
+      <ul class="auth-deco-perks mt-5">
+        <li><i class="fa fa-circle-check"></i> Reservas en segundos</li>
+        <li><i class="fa fa-circle-check"></i> Recomendaciones personalizadas</li>
+        <li><i class="fa fa-circle-check"></i> Historial de reservas</li>
+        <li><i class="fa fa-circle-check"></i> Acceso al asistente IA</li>
+      </ul>
+    </div>
   </div>
-  <div class="mb-3">
-    {{ form.correo.label }} {{ form.correo(class="form-control") }}
+
+  <!-- Form side -->
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+
+      <div class="auth-header">
+        <h1>Crear cuenta</h1>
+        <p>Completa tus datos para comenzar</p>
+      </div>
+
+      <form method="post" novalidate class="auth-form">
+        {{ form.hidden_tag() }}
+
+        <div class="form-row-two">
+          <div class="form-group-luxury">
+            <label><i class="fa fa-user"></i> Nombre completo</label>
+            {{ form.nombre(
+                class="input-luxury" + (" input-error" if form.nombre.errors else ""),
+                placeholder="Tu nombre"
+            ) }}
+            {% for e in form.nombre.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-phone"></i> Teléfono</label>
+            {{ form.telefono(
+                class="input-luxury" + (" input-error" if form.telefono.errors else ""),
+                placeholder="+506 8888-8888"
+            ) }}
+            {% for e in form.telefono.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group-luxury">
+          <label><i class="fa fa-envelope"></i> Correo electrónico</label>
+          {{ form.correo(
+              class="input-luxury" + (" input-error" if form.correo.errors else ""),
+              placeholder="tu@correo.com",
+              autocomplete="email"
+          ) }}
+          {% for e in form.correo.errors %}
+            <span class="field-error">{{ e }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-row-two">
+          <div class="form-group-luxury">
+            <label><i class="fa fa-cake-candles"></i> Edad</label>
+            {{ form.edad(
+                class="input-luxury" + (" input-error" if form.edad.errors else ""),
+                placeholder="25"
+            ) }}
+            {% for e in form.edad.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-venus-mars"></i> Género</label>
+            {{ form.genero(class="input-luxury select-luxury" + (" input-error" if form.genero.errors else "")) }}
+            {% for e in form.genero.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-row-two">
+          <div class="form-group-luxury">
+            <label><i class="fa fa-lock"></i> Contraseña</label>
+            <div class="input-icon-right">
+              {{ form.password(
+                  id="password",
+                  class="input-luxury" + (" input-error" if form.password.errors else ""),
+                  placeholder="Mínimo 6 caracteres"
+              ) }}
+              <button type="button" class="toggle-password" onclick="togglePwd('password')">
+                <i class="fa fa-eye" id="eye-password"></i>
+              </button>
+            </div>
+            {% for e in form.password.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-lock"></i> Confirmar contraseña</label>
+            <div class="input-icon-right">
+              {{ form.password2(
+                  id="password2",
+                  class="input-luxury" + (" input-error" if form.password2.errors else ""),
+                  placeholder="Repetir contraseña"
+              ) }}
+              <button type="button" class="toggle-password" onclick="togglePwd('password2')">
+                <i class="fa fa-eye" id="eye-password2"></i>
+              </button>
+            </div>
+            {% for e in form.password2.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <button type="submit" class="btn-gold w-100 btn-submit mt-2">
+          Crear cuenta <i class="fa fa-arrow-right ms-2"></i>
+        </button>
+      </form>
+
+      <p class="auth-switch mt-4">
+        ¿Ya tienes cuenta?
+        <a href="{{ url_for('auth.login') }}">Inicia sesión</a>
+      </p>
+
+    </div>
   </div>
-  <div class="mb-3">
-    {{ form.telefono.label }} {{ form.telefono(class="form-control") }}
-  </div>
-  <div class="mb-3">
-    {{ form.edad.label }} {{ form.edad(class="form-control") }}
-  </div>
-  <div class="mb-3">
-    {{ form.genero.label }} {{ form.genero(class="form-select") }}
-  </div>
-  <div class="mb-3">
-    {{ form.password.label }} {{ form.password(class="form-control") }}
-  </div>
-  <div class="mb-3">
-    {{ form.password2.label }} {{ form.password2(class="form-control") }}
-  </div>
-  <button type="submit" class="btn btn-success">Registrarse</button>
-</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function togglePwd(id) {
+    const input = document.getElementById(id);
+    const icon = document.getElementById('eye-' + id);
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+</script>
 {% endblock %}

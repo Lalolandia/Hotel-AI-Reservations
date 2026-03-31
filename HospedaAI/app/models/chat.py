@@ -1,3 +1,4 @@
+# app/models/chat.py
 from app import db
 from datetime import datetime
 
@@ -11,6 +12,6 @@ class Chat(db.Model):
 
     cliente_id = db.Column(
         db.Integer,
-        db.ForeignKey("cliente.id"),
+        db.ForeignKey("clientes.id"),   # corregido: era "cliente.id"
         nullable=False
     )

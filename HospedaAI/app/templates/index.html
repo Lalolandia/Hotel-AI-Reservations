@@ -1,35 +1,209 @@
 {% extends "base.html" %}
-{% block title %}Inicio - Hotel Reservations{% endblock %}
+{% block title %}HotelAI — Bienvenido{% endblock %}
+
 {% block content %}
-<section class="hero mb-5">
-  <div class="hero-image rounded-4 overflow-hidden" style="height:520px; background:url('{{ url_for('static', filename='img/hero/hotel-hero.jpg') }}') center/cover no-repeat;">
-    <div class="hero-overlay d-flex align-items-center h-100" style="background:rgba(0,0,0,0.35);">
-      <div class="container text-white">
-        <h1 class="display-4 fw-bold">Bienvenido a Hotel Reservations</h1>
-        <p class="lead">Reserva habitaciones, revisa paquetes y habla con nuestro asistente inteligente.</p>
-        <a class="btn btn-accent btn-lg" href="{{ url_for('main.rooms') }}">Ver habitaciones</a>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero-section">
+  <div class="hero-bg">
+    <!-- Gradient fallback + overlay -->
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="hero-content container">
+    <p class="hero-eyebrow">✦ Bienvenido a HotelAI</p>
+    <h1 class="hero-title">
+      Donde el lujo<br>
+      <em>encuentra la inteligencia</em>
+    </h1>
+    <p class="hero-subtitle">
+      Reserva tu habitación perfecta con la ayuda de nuestro asistente de IA.<br>
+      Paquetes exclusivos, vistas inolvidables.
+    </p>
+    <div class="hero-ctas">
+      <a href="{{ url_for('main.rooms') }}" class="btn-gold btn-lg-hero">
+        Explorar habitaciones
+      </a>
+      <a href="{{ url_for('main.chat') }}" class="btn-outline-hero">
+        <i class="fa fa-robot me-2"></i>Hablar con IA
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">98%</span>
+        <span class="stat-label">Satisfacción</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">50+</span>
+        <span class="stat-label">Habitaciones</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">25</span>
+        <span class="stat-label">Años de experiencia</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span>Descubrir</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════ BOOKING BAR ═══════════ -->
+<section class="booking-section">
+  <div class="container">
+    <div class="booking-bar-luxury">
+      <form action="{{ url_for('main.search') }}" method="get" class="booking-form">
+        <div class="booking-field">
+          <label><i class="fa fa-location-dot"></i> Destino</label>
+          <input name="q" placeholder="¿Qué tipo de habitación?" value="{{ request.args.get('q','') }}">
+        </div>
+        <div class="booking-divider"></div>
+        <div class="booking-field">
+          <label><i class="fa fa-calendar"></i> Fechas</label>
+          <input type="text" name="dates" class="date-picker" placeholder="Check-in → Check-out" value="{{ request.args.get('dates','') }}">
+        </div>
+        <div class="booking-divider"></div>
+        <div class="booking-field">
+          <label><i class="fa fa-user-group"></i> Huéspedes</label>
+          <select name="people">
+            {% for i in range(1,7) %}
+              <option value="{{ i }}" {% if request.args.get('people') == i|string %}selected{% endif %}>
+                {{ i }} persona{{ 's' if i > 1 else '' }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="booking-btn">
+          <i class="fa fa-magnifying-glass me-2"></i>Buscar
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SERVICIOS ═══════════ -->
+<section class="amenities-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <p class="section-eyebrow">✦ Lo que ofrecemos</p>
+      <h2 class="section-title">Una experiencia completa</h2>
+    </div>
+    <div class="amenities-grid">
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-wifi"></i></div>
+        <h5>WiFi Premium</h5>
+        <p>Conectividad de alta velocidad en todas las áreas del hotel.</p>
+      </div>
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-water-ladder"></i></div>
+        <h5>Piscina & Spa</h5>
+        <p>Relájate en nuestra piscina infinita con vista panorámica.</p>
+      </div>
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-utensils"></i></div>
+        <h5>Desayuno incluido</h5>
+        <p>Buffet gourmet con opciones locales e internacionales.</p>
+      </div>
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-robot"></i></div>
+        <h5>Asistente IA</h5>
+        <p>Tu concierge inteligente disponible 24/7 para recomendarte.</p>
+      </div>
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-car"></i></div>
+        <h5>Estacionamiento</h5>
+        <p>Parqueo privado y seguro incluido en tu reserva.</p>
+      </div>
+      <div class="amenity-card">
+        <div class="amenity-icon"><i class="fa fa-person-hiking"></i></div>
+        <h5>Actividades</h5>
+        <p>Tours y experiencias guiadas por la región.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-4">
-  <div class="row">
-    <div class="col-md-8">
-      <h3>Habitaciones destacadas</h3>
-      {% include 'partials/_rooms_grid.html' %}
+<!-- ═══════════ HABITACIONES DESTACADAS ═══════════ -->
+<section class="rooms-featured-section">
+  <div class="container">
+    <div class="section-header d-flex justify-content-between align-items-end">
+      <div>
+        <p class="section-eyebrow">✦ Nuestras habitaciones</p>
+        <h2 class="section-title mb-0">Alojamiento de lujo</h2>
+      </div>
+      <a href="{{ url_for('main.rooms') }}" class="view-all-link">
+        Ver todas <i class="fa fa-arrow-right ms-1"></i>
+      </a>
     </div>
-    <div class="col-md-4">
-      <h5>Servicios</h5>
-      <ul class="list-unstyled">
-        <li><i class="fa fa-check text-accent"></i> WiFi gratis</li>
-        <li><i class="fa fa-check text-accent"></i> Piscina</li>
-        <li><i class="fa fa-check text-accent"></i> Desayuno incluido</li>
-      </ul>
-      <h5 class="mt-4">Chat con IA</h5>
-      <p>Pide recomendaciones de paquetes y habitaciones mediante el asistente.</p>
-      <a class="btn btn-outline-secondary" href="{{ url_for('main.chat') }}">Abrir chat</a>
+
+    <div class="rooms-grid mt-5">
+      {% if rooms %}
+        {% for room in rooms %}
+        <a href="{{ url_for('main.room_detail', room_id=room.id) }}" class="room-card-luxury">
+          <div class="room-card-img">
+            {% if room.tipo %}
+              <div class="room-img-placeholder">
+                <i class="fa fa-bed"></i>
+              </div>
+            {% endif %}
+            <span class="room-badge">{{ room.estado }}</span>
+          </div>
+          <div class="room-card-body">
+            <h5>Habitación #{{ room.numero }}</h5>
+            <p class="room-type">{{ room.tipo.nombre if room.tipo else 'Estándar' }}</p>
+            <div class="room-meta">
+              <span><i class="fa fa-user"></i> {{ room.capacidad or '—' }}</span>
+              <span><i class="fa fa-layer-group"></i> Piso {{ room.piso or '—' }}</span>
+            </div>
+            <div class="room-footer">
+              <div class="room-price">
+                <span class="price-amount">${{ room.tipo.precio_noche if room.tipo else '—' }}</span>
+                <span class="price-night">/ noche</span>
+              </div>
+              <span class="room-cta">Reservar <i class="fa fa-arrow-right"></i></span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <p class="text-center text-muted py-5">No hay habitaciones disponibles en este momento.</p>
+      {% endif %}
     </div>
   </div>
 </section>
+
+<!-- ═══════════ CTA IA ═══════════ -->
+<section class="ai-cta-section">
+  <div class="container">
+    <div class="ai-cta-card">
+      <div class="ai-cta-glow"></div>
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <p class="section-eyebrow" style="color: var(--gold)">✦ Tecnología + Hospitalidad</p>
+          <h2 class="section-title text-white">¿No sabes qué habitación elegir?</h2>
+          <p class="text-white-50 mb-4">
+            Nuestro asistente de inteligencia artificial te ayuda a encontrar la habitación y el paquete ideal según tus preferencias, fechas y presupuesto.
+          </p>
+          <a href="{{ url_for('main.chat') }}" class="btn-gold">
+            <i class="fa fa-robot me-2"></i>Iniciar conversación
+          </a>
+        </div>
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center">
+          <div class="ai-illustration">
+            <i class="fa fa-robot"></i>
+            <div class="ai-pulse"></div>
+            <div class="ai-pulse delay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

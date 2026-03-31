@@ -1,14 +1,108 @@
 {% extends 'base.html' %}
+{% block title %}Iniciar sesión — HotelAI{% endblock %}
+
 {% block content %}
-<h2>Iniciar sesión</h2>
-<form method="post">
-  {{ form.hidden_tag() }}
-  <div class="mb-3">
-    {{ form.correo.label }} {{ form.correo(class="form-control") }}
+<div class="auth-page">
+  <!-- Decorative side -->
+  <div class="auth-deco">
+    <div class="auth-deco-overlay"></div>
+    <div class="auth-deco-content">
+      <div class="brand mb-4">
+        <span class="brand-hotel">Hotel</span><span class="brand-ai">AI</span>
+      </div>
+      <h2>Tu hogar<br><em>lejos de casa</em></h2>
+      <p>Experiencias únicas de alojamiento con el respaldo de tecnología inteligente.</p>
+      <div class="auth-deco-stats mt-5">
+        <div>
+          <strong>98%</strong>
+          <span>Satisfacción</span>
+        </div>
+        <div>
+          <strong>50+</strong>
+          <span>Habitaciones</span>
+        </div>
+        <div>
+          <strong>24/7</strong>
+          <span>Asistente IA</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    {{ form.password.label }} {{ form.password(class="form-control") }}
+
+  <!-- Form side -->
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+
+      <div class="auth-header">
+        <h1>Bienvenido de vuelta</h1>
+        <p>Inicia sesión para gestionar tus reservas</p>
+      </div>
+
+      <form method="post" novalidate class="auth-form">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group-luxury">
+          <label for="correo">
+            <i class="fa fa-envelope"></i> Correo electrónico
+          </label>
+          {{ form.correo(
+              id="correo",
+              class="input-luxury" + (" input-error" if form.correo.errors else ""),
+              placeholder="tu@correo.com",
+              autocomplete="email"
+          ) }}
+          {% for error in form.correo.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group-luxury">
+          <label for="password">
+            <i class="fa fa-lock"></i> Contraseña
+          </label>
+          <div class="input-icon-right">
+            {{ form.password(
+                id="password",
+                class="input-luxury" + (" input-error" if form.password.errors else ""),
+                placeholder="••••••••",
+                autocomplete="current-password"
+            ) }}
+            <button type="button" class="toggle-password" onclick="togglePwd('password')">
+              <i class="fa fa-eye" id="eye-password"></i>
+            </button>
+          </div>
+          {% for error in form.password.errors %}
+            <span class="field-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-gold w-100 btn-submit">
+          Iniciar sesión <i class="fa fa-arrow-right ms-2"></i>
+        </button>
+      </form>
+
+      <p class="auth-switch mt-4">
+        ¿Aún no tienes cuenta?
+        <a href="{{ url_for('auth.register') }}">Regístrate gratis</a>
+      </p>
+
+    </div>
   </div>
-  <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function togglePwd(id) {
+    const input = document.getElementById(id);
+    const icon = document.getElementById('eye-' + id);
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+</script>
 {% endblock %}
