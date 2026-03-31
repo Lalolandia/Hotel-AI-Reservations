@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Registro</h2>
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    {{ form.nombre.label }} {{ form.nombre(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.correo.label }} {{ form.correo(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.telefono.label }} {{ form.telefono(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.edad.label }} {{ form.edad(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.genero.label }} {{ form.genero(class="form-select") }}
+  </div>
+  <div class="mb-3">
+    {{ form.password.label }} {{ form.password(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.password2.label }} {{ form.password2(class="form-control") }}
+  </div>
+  <button type="submit" class="btn btn-success">Registrarse</button>
+</form>
+{% endblock %}

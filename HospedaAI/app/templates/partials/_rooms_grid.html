@@ -1,0 +1,21 @@
+<div class="container py-5">
+
+  <div class="row">
+    {% if rooms %}
+
+      {% for room in rooms %}
+        <div class="col-md-4 mb-4">
+          {% include 'partials/_room_card.html' %}
+        </div>
+      {% endfor %}
+
+    {% else %}
+
+      <div class="col-12 text-center">
+        <p class="text-muted">No hay habitaciones disponibles.</p>
+      </div>
+
+    {% endif %}
+  </div>
+
+</div>

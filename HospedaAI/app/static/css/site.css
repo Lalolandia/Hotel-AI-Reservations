@@ -1,0 +1,55 @@
+body{
+font-family: Arial;
+margin:0;
+}
+
+.hero{
+height:80vh;
+background-image:url("/static/img/hotel.jpg");
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.overlay{
+background:rgba(0,0,0,0.4);
+color:white;
+padding:40px;
+text-align:center;
+}
+
+.search-box{
+margin-top:20px;
+}
+
+.search-box input{
+padding:10px;
+margin:5px;
+}
+
+.search-box button{
+background:#d40000;
+color:white;
+border:none;
+padding:12px 25px;
+cursor:pointer;
+}
+
+.room-grid{
+display:flex;
+gap:20px;
+justify-content:center;
+}
+
+.room-card{
+width:300px;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+.room-card img{
+width:100%;
+}

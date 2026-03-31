@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Inicio - Hotel Reservations{% endblock %}
+{% block content %}
+<section class="hero mb-5">
+  <div class="hero-image rounded-4 overflow-hidden" style="height:520px; background:url('{{ url_for('static', filename='img/hero/hotel-hero.jpg') }}') center/cover no-repeat;">
+    <div class="hero-overlay d-flex align-items-center h-100" style="background:rgba(0,0,0,0.35);">
+      <div class="container text-white">
+        <h1 class="display-4 fw-bold">Bienvenido a Hotel Reservations</h1>
+        <p class="lead">Reserva habitaciones, revisa paquetes y habla con nuestro asistente inteligente.</p>
+        <a class="btn btn-accent btn-lg" href="{{ url_for('main.rooms') }}">Ver habitaciones</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-</body>
-</html>
+<section class="py-4">
+  <div class="row">
+    <div class="col-md-8">
+      <h3>Habitaciones destacadas</h3>
+      {% include 'partials/_rooms_grid.html' %}
+    </div>
+    <div class="col-md-4">
+      <h5>Servicios</h5>
+      <ul class="list-unstyled">
+        <li><i class="fa fa-check text-accent"></i> WiFi gratis</li>
+        <li><i class="fa fa-check text-accent"></i> Piscina</li>
+        <li><i class="fa fa-check text-accent"></i> Desayuno incluido</li>
+      </ul>
+      <h5 class="mt-4">Chat con IA</h5>
+      <p>Pide recomendaciones de paquetes y habitaciones mediante el asistente.</p>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.chat') }}">Abrir chat</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

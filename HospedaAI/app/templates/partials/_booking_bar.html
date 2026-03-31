@@ -1,0 +1,24 @@
+<div class="booking-bar shadow-lg rounded-3 p-3 mb-4 position-relative" style="margin-top:-80px; z-index:60; background:#fff;">
+  <form action="{{ url_for('main.search') }}" method="get" class="row g-2 align-items-center">
+    <div class="col-md-4">
+      <label class="form-label small">¿A dónde quieres ir?</label>
+      <input class="form-control" name="q" placeholder="Hotel o destino..." value="{{ request.args.get('q','') }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small">Fechas</label>
+      <input type="text" name="dates" class="form-control date-picker" placeholder="Selecciona fechas" value="{{ request.args.get('dates','') }}">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Personas</label>
+      <select name="people" class="form-select">
+        {% for i in range(1,6) %}
+          <option value="{{ i }}" {% if request.args.get('people') == i|string %}selected{% endif %}>{{ i }} persona(s)</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-grid">
+      <label class="form-label small">&nbsp;</label>
+      <button class="btn btn-accent btn-lg" type="submit">Buscar</button>
+    </div>
+  </form>
+</div>
