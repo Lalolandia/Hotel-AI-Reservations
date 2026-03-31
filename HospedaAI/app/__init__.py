@@ -38,5 +38,9 @@ def create_app():
     # Importar modelos para que Alembic los detecte
     with app.app_context():
         from app import models  # models/__init__.py importa cada modelo
+        from app import models
+        from app.routes.habitacion_routes import habitacion_bp
+
+        app.register_blueprint(habitacion_bp)
 
     return app
