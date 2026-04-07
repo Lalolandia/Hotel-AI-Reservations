@@ -1,43 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
+<section class="crud-page">
+    <div class="container">
+        <div class="crud-form-card">
+            <div class="crud-form-header">
+                <p class="section-eyebrow">Gestion hotelera</p>
+                <h1 class="section-title">Editar habitacion</h1>
+                <p class="crud-subtitle">Actualiza los datos de la habitacion {{ habitacion.numero }}.</p>
+            </div>
 
-<h2>Editar Habitación</h2>
+            <form method="POST" class="crud-form">
+                <div class="form-group-luxury">
+                    <label>Numero</label>
+                    <input type="text" name="numero" class="input-luxury" value="{{ habitacion.numero }}" required>
+                </div>
 
-<form method="POST">
+                <div class="form-group-luxury">
+                    <label>Estado</label>
+                    <select name="estado" class="input-luxury select-luxury">
+                        <option value="disponible" {% if habitacion.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                        <option value="ocupada" {% if habitacion.estado == 'ocupada' %}selected{% endif %}>Ocupada</option>
+                        <option value="mantenimiento" {% if habitacion.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                    </select>
+                </div>
 
-    <div class="mb-3">
-        <label>Número</label>
-        <input type="text" name="numero" class="form-control" value="{{ habitacion.numero }}">
+                <div class="form-group-luxury">
+                    <label>Tipo de habitacion</label>
+                    <select name="tipo_id" class="input-luxury select-luxury" required>
+                        {% for t in tipos %}
+                        <option value="{{ t.id }}" {% if habitacion.tipo_id == t.id %}selected{% endif %}>
+                            {{ t.nombre }} | {{ t.capacidad }} personas | ${{ t.precio_noche }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="crud-form-actions">
+                    <button class="btn-gold" type="submit">Actualizar habitacion</button>
+                    <a href="{{ url_for('habitaciones.listar') }}" class="btn-ghost">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Piso</label>
-        <input type="number" name="piso" class="form-control" value="{{ habitacion.piso }}">
-    </div>
-
-    <div class="mb-3">
-        <label>Estado</label>
-        <select name="estado" class="form-control">
-
-            <option value="disponible" {% if habitacion.estado == 'disponible' %}selected{% endif %}>
-                Disponible
-            </option>
-
-            <option value="ocupada" {% if habitacion.estado == 'ocupada' %}selected{% endif %}>
-                Ocupada
-            </option>
-
-            <option value="mantenimiento" {% if habitacion.estado == 'mantenimiento' %}selected{% endif %}>
-                Mantenimiento
-            </option>
-
-        </select>
-    </div>
-
-    <button class="btn btn-primary">Actualizar</button>
-    <a href="/habitaciones" class="btn btn-secondary">Cancelar</a>
-
-</form>
-
+</section>
 {% endblock %}

@@ -945,6 +945,133 @@ img { max-width: 100%; display: block; }
 }
 .auth-switch a:hover { border-color: var(--gold); }
 
+/* CRUD HABITACIONES */
+.crud-page {
+  padding: 140px 0 80px;
+}
+
+.crud-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.crud-subtitle {
+  color: var(--muted);
+  max-width: 640px;
+  margin-top: 10px;
+}
+
+.crud-table-card,
+.crud-form-card,
+.crud-empty-state {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.crud-table-card {
+  overflow: hidden;
+}
+
+.crud-table thead th {
+  background: rgba(201,168,108,0.08);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 18px 20px;
+}
+
+.crud-table tbody td {
+  padding: 18px 20px;
+  border-color: rgba(201,168,108,0.12);
+  vertical-align: middle;
+}
+
+.crud-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.crud-actions form {
+  margin: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-disponible {
+  background: #ecfdf3;
+  color: #047857;
+}
+
+.status-ocupada {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-mantenimiento {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.crud-form-card {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px;
+}
+
+.crud-form-header {
+  margin-bottom: 28px;
+}
+
+.crud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.crud-form-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.crud-empty-state {
+  padding: 56px 32px;
+  text-align: center;
+}
+
+.crud-empty-state i {
+  font-size: 42px;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.crud-empty-state h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.crud-empty-state p {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
 /* ═══════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════ */
@@ -958,6 +1085,7 @@ img { max-width: 100%; display: block; }
 
   .ai-cta-card { padding: 40px 28px; }
   .form-row-two { grid-template-columns: 1fr; }
+  .crud-header { align-items: start; flex-direction: column; }
 
   .hero-scroll-hint { display: none; }
   .hero-stats { gap: 20px; }
@@ -969,4 +1097,7 @@ img { max-width: 100%; display: block; }
   .rooms-grid { grid-template-columns: 1fr; }
   .amenities-grid { grid-template-columns: 1fr; }
   .auth-form-container { max-width: 100%; }
+  .crud-page { padding-top: 120px; }
+  .crud-form-card { padding: 24px; }
+  .crud-actions { justify-content: start; }
 }
