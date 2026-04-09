@@ -44,11 +44,7 @@ def generate_reset_token(email: str, code: str) -> str:
 
 
 def verify_reset_token(token: str, code: str, expiration: int = 3600) -> str | bool:
-    """
-    Verifica el token de recuperación y que el código coincida.
-    Devuelve el email si todo es válido, False si no.
-    Expira en 1 hora por defecto.
-    """
+
     s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     try:
         data = s.loads(token, salt='password-reset-salt', max_age=expiration)
