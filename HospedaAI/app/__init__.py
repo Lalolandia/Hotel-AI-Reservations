@@ -28,16 +28,18 @@ def create_app():
     login_manager.login_message = "Por favor inicia sesión para acceder a esta página."
     login_manager.login_message_category = "info"
 
-    # Importar blueprints y registrar
+    # 🔥 Importar blueprints
     from app.routes.auth import auth_bp
     from app.routes.main import main
+    from app.routes.reservas_routes import reservas_bp  # 👈 NUEVO
 
+    # 🔥 Registrar blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(main)
+    app.register_blueprint(reservas_bp)  # 👈 NUEVO
 
     # Importar modelos para que Alembic los detecte
     with app.app_context():
-        from app import models  # models/__init__.py importa cada modelo
         from app import models
         from app.routes.habitacion_routes import habitacion_bp
 

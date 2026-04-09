@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="crud-page">
+    <div class="container">
+
+        <div class="crud-header">
+            <div>
+                <p class="section-eyebrow">Gestion hotelera</p>
+                <h1 class="section-title">Reservas registradas</h1>
+                <p class="crud-subtitle">
+                    Consulta las reservas creadas y administra la informacion principal desde un solo lugar.
+                </p>
+            </div>
+
+            <a href="{{ url_for('reservas.crear_reserva') }}" class="btn-gold">
+                <i class="fa fa-plus me-2"></i>Crear reserva
+            </a>
+        </div>
+
+        {% if reservas %}
+        <div class="crud-table-card">
+            <div class="table-responsive">
+                <table class="table crud-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Habitación</th>
+                            <th>Fecha inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Total</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservas %}
+                        <tr>
+                            <td>#{{ r.id }}</td>
+
+                            <td>
+                                {{ r.cliente.nombre if r.cliente else r.cliente_id }}
+                            </td>
+
+                            <td>
+                                {{ r.habitacion.numero if r.habitacion else r.habitacion_id }}
+                            </td>
+
+                            <td>{{ r.fecha_inicio }}</td>
+                            <td>{{ r.fecha_fin }}</td>
+
+                            <td class="fw-bold text-success">
+                                ${{ r.total }}
+                            </td>
+
+                            <td class="text-end">
+                                <div class="crud-actions">
+                                    <a href="{{ url_for('reservas.detalle_reserva', id=r.id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver detalle
+                                    </a>
+
+                                    <a href="{{ url_for('reservas.cancelar_reserva', id=r.id) }}"
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('¿Cancelar esta reserva?');">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="crud-empty-state">
+            <i class="fa fa-calendar-check"></i>
+            <h2>No hay reservas registradas</h2>
+            <p>Empieza creando la primera reserva para visualizarla aquí.</p>
+            <a href="{{ url_for('reservas.crear_reserva') }}" class="btn-gold">
+                Crear primera reserva
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

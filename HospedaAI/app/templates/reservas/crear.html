@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="crud-page">
+    <div class="container">
+        <div class="crud-form-card">
+            <div class="crud-form-header">
+                <p class="section-eyebrow">Gestion hotelera</p>
+                <h1 class="section-title">Crear reserva</h1>
+                <p class="crud-subtitle">Selecciona los datos para registrar una nueva reserva.</p>
+            </div>
+
+            <form method="POST" class="crud-form">
+                <div class="form-group-luxury">
+                    <label>Cliente</label>
+                    <select name="cliente_id" class="input-luxury select-luxury" required>
+                        {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Habitación</label>
+                    <select name="habitacion_id" class="input-luxury select-luxury" required>
+                        {% for h in habitaciones %}
+                        <option value="{{ h.id }}">
+                            Habitación {{ h.numero }} - ${{ h.tipo.precio_noche }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Fecha inicio</label>
+                    <input type="date" name="fecha_inicio" class="input-luxury" required>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Fecha fin</label>
+                    <input type="date" name="fecha_fin" class="input-luxury" required>
+                </div>
+
+                <div class="crud-form-actions">
+                    <button class="btn-gold" type="submit">Guardar reserva</button>
+                    <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
