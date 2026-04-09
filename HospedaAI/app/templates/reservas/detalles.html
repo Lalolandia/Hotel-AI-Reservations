@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="crud-page">
+    <div class="container">
+        <div class="crud-form-card">
+
+            <div class="crud-form-header">
+                <p class="section-eyebrow">Gestion hotelera</p>
+                <h1 class="section-title">Detalle de reserva</h1>
+                <p class="crud-subtitle">
+                    Información completa de la reserva seleccionada.
+                </p>
+            </div>
+
+            <div class="crud-form">
+
+                <div class="form-group-luxury">
+                    <label>ID</label>
+                    <p>#{{ reserva.id }}</p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Cliente</label>
+                    <p>
+                        {{ reserva.cliente.nombre if reserva.cliente else "N/A" }}
+                    </p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Habitación</label>
+                    <p>
+                        Habitación {{ reserva.habitacion.numero if reserva.habitacion else "N/A" }}
+                    </p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Tipo de habitación</label>
+                    <p>
+                        {{ reserva.habitacion.tipo.nombre if reserva.habitacion and reserva.habitacion.tipo else "N/A" }}
+                    </p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Fecha inicio</label>
+                    <p>{{ reserva.fecha_inicio }}</p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Fecha fin</label>
+                    <p>{{ reserva.fecha_fin }}</p>
+                </div>
+
+                <div class="form-group-luxury">
+                    <label>Total</label>
+                    <p class="text-success fw-bold">${{ reserva.total }}</p>
+                </div>
+
+                <div class="crud-form-actions">
+                    <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">
+                        Volver
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
