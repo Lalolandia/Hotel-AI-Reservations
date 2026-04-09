@@ -1220,3 +1220,36 @@ img { max-width: 100%; display: block; }
   .crud-form-card { padding: 24px; }
   .crud-actions { justify-content: start; }
 }
+
+.chat-container {
+  max-width: 600px;
+  margin: auto;
+}
+
+.chat-box {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.message {
+  margin: 10px 0;
+}
+
+.user {
+  text-align: right;
+  color: blue;
+}
+
+.bot {
+  text-align: left;
+  color: green;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}

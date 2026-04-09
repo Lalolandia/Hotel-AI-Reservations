@@ -5,7 +5,7 @@
   <div class="container">
     <div class="chat-assistant-header">
       <p class="section-eyebrow mb-2">Asistente de reservas</p>
-      <h1 class="section-title mb-3">Chat inteligente (reglas)</h1>
+      <h1 class="section-title mb-3">Chat inteligente</h1>
       <p class="chat-assistant-subtitle">
         Completa los datos de tu viaje y te recomendaremos la mejor habitacion,
         junto con alternativas segun disponibilidad, capacidad y presupuesto.
@@ -15,31 +15,19 @@
     <div class="chat-assistant-grid">
       <article class="chat-assistant-card">
         <h2>Cuentame tu plan</h2>
-        <form id="chat-assistant-form" class="chat-form-grid">
-          <div>
-            <label for="fecha_inicio">Fecha entrada</label>
-            <input id="fecha_inicio" name="fecha_inicio" type="date" required>
-          </div>
-          <div>
-            <label for="fecha_fin">Fecha salida</label>
-            <input id="fecha_fin" name="fecha_fin" type="date" required>
-          </div>
-          <div>
-            <label for="personas">Personas</label>
-            <input id="personas" name="personas" type="number" min="1" value="2" required>
-          </div>
-          <div>
-            <label for="presupuesto">Presupuesto por noche (opcional)</label>
-            <input id="presupuesto" name="presupuesto" type="number" min="1" step="0.01" placeholder="Ej: 150">
-          </div>
-          <div class="chat-form-full">
-            <label for="actividades">Actividades de interes (opcional)</label>
-            <input id="actividades" name="actividades" type="text" placeholder="spa, piscina, tour">
-          </div>
-          <div class="chat-form-full">
-            <button type="submit" class="btn-gold">Obtener recomendacion</button>
-          </div>
-        </form>
+        <div id="chat-box" class="chat-form-grid" style="max-height: 300px; overflow-y: auto;">
+  <p class="chat-empty"><strong>Asistente:</strong> Hola 👋 Cuéntame, ¿para qué fechas deseas la reserva? (Ej: 2026-04-12)</p>
+</div>
+
+<form id="chat-form" class="chat-form-grid mt-3">
+  <div class="chat-form-full">
+    <input id="user-input" type="text" placeholder="Escribe tu respuesta..." required>
+  </div>
+  <div class="chat-form-full">
+    <button type="submit" class="btn-gold">Enviar</button>
+  </div>
+</form>
+
       </article>
 
       <article class="chat-assistant-card" id="chat-result">
@@ -54,64 +42,106 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  const form = document.getElementById("chat-assistant-form");
-  const resultBox = document.getElementById("chat-result");
+const chatBox = document.getElementById("chat-box");
+const form = document.getElementById("chat-form");
+const input = document.getElementById("user-input");
+const resultBox = document.getElementById("chat-result");
 
-  function currency(value) {
-    return new Intl.NumberFormat("es-CR", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2
-    }).format(value);
+// 🔥 estado del chat
+let state = {
+  fecha_inicio: null,
+  fecha_fin: null,
+  personas: null,
+  presupuesto: null,
+  actividades: null
+};
+
+let step = 0;
+
+//  UI mensajes
+function addMessage(sender, text) {
+  chatBox.innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function currency(value) {
+  return new Intl.NumberFormat("es-CR", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
+function recommendationCard(title, room) {
+  return `
+    <div class="chat-room-card">
+      <h3>${title}</h3>
+      <p><strong>Habitacion:</strong> #${room.numero} (${room.tipo_habitacion})</p>
+      <p><strong>Capacidad:</strong> ${room.capacidad} personas</p>
+      <p><strong>Precio por noche:</strong> ${currency(room.precio_noche)}</p>
+      <p><strong>Total estimado:</strong> ${currency(room.total_estimado)}</p>
+      <a class="btn-gold mt-2" href="${room.booking_url}">Reservar</a>
+    </div>
+  `;
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const message = input.value;
+  addMessage("Tú", message);
+  input.value = "";
+
+  // flujo conversacional
+  if (step === 0) {
+    state.fecha_inicio = message;
+    addMessage("Asistente", "¿Cuál es la fecha de salida? (Ej: 2026-04-12)");
+    step++;
+    return;
   }
 
-  function recommendationCard(title, room, showReserveButton = true) {
-    const reserveButton = showReserveButton
-      ? `<a class="btn-gold mt-2" href="${room.booking_url}">Reservar</a>`
-      : "";
-
-    return `
-      <div class="chat-room-card">
-        <h3>${title}</h3>
-        <p><strong>Habitacion:</strong> #${room.numero} (${room.tipo_habitacion})</p>
-        <p><strong>Capacidad:</strong> ${room.capacidad} personas</p>
-        <p><strong>Precio por noche:</strong> ${currency(room.precio_noche)}</p>
-        <p><strong>Total estimado:</strong> ${currency(room.total_estimado)}</p>
-        ${reserveButton}
-      </div>
-    `;
+  if (step === 1) {
+    state.fecha_fin = message;
+    addMessage("Asistente", "¿Cuántas personas? (Ej: 2)");
+    step++;
+    return;
   }
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  if (step === 2) {
+    state.personas = message;
+    addMessage("Asistente", "¿Presupuesto por noche? (Ej: 100)");
+    step++;
+    return;
+  }
 
-    resultBox.innerHTML = "<h2>Recomendacion</h2><p class='chat-empty'>Consultando disponibilidad...</p>";
+  if (step === 3) {
+    state.presupuesto = message;
+    addMessage("Asistente", "¿Actividades de interés? (Ej: spa, piscina)");
+    step++;
+    return;
+  }
 
-    const payload = {
-      fecha_inicio: form.fecha_inicio.value,
-      fecha_fin: form.fecha_fin.value,
-      personas: form.personas.value,
-      presupuesto: form.presupuesto.value,
-      actividades: form.actividades.value
-    };
+  if (step === 4) {
+    state.actividades = message;
+
+    addMessage("Asistente", "Consultando disponibilidad... 🔎");
+
+    resultBox.innerHTML = "<h2>Recomendacion</h2><p class='chat-empty'>Procesando...</p>";
 
     try {
       const response = await fetch("/api/chat/recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(state)
       });
+
       const data = await response.json();
 
       if (!response.ok || !data.ok) {
-        const errors = (data.errors || ["No se pudo procesar la solicitud."])
-          .map(err => `<li>${err}</li>`)
-          .join("");
         resultBox.innerHTML = `
           <h2>Recomendacion</h2>
           <div class="chat-errors">
-            <p>Corrige lo siguiente:</p>
-            <ul>${errors}</ul>
+            <p>Error al procesar la solicitud</p>
           </div>
         `;
         return;
@@ -119,37 +149,40 @@
 
       const recommendation = data.recommendation;
       const alternatives = data.alternatives || [];
-      const summaryMessage = `<p class="chat-message">${data.message}</p>`;
 
-      if (!recommendation) {
-        resultBox.innerHTML = `<h2>Recomendacion</h2>${summaryMessage}`;
-        return;
+      let html = `<h2>Recomendacion</h2>`;
+      html += `<p class="chat-message">${data.message}</p>`;
+
+      if (recommendation) {
+        html += recommendationCard("Opcion principal", recommendation);
       }
 
-      const alternativesHtml = alternatives.length
-        ? `
+      if (alternatives.length) {
+        html += `
           <div class="chat-alt-list">
             <h3>Alternativas</h3>
-            ${alternatives.map(room => recommendationCard("Alternativa", room, true)).join("")}
+            ${alternatives.map(r => recommendationCard("Alternativa", r)).join("")}
           </div>
-        `
-        : "";
+        `;
+      }
 
-      resultBox.innerHTML = `
-        <h2>Recomendacion</h2>
-        ${summaryMessage}
-        ${recommendationCard("Opcion principal", recommendation, true)}
-        ${alternativesHtml}
-      `;
+      resultBox.innerHTML = html;
+
     } catch (error) {
       resultBox.innerHTML = `
         <h2>Recomendacion</h2>
         <div class="chat-errors">
-          <p>Ocurrio un error inesperado al consultar el asistente.</p>
+          <p>Error del servidor</p>
         </div>
       `;
     }
-  });
+
+    // reset
+    step = 0;
+    state = {};
+  }
+});
 </script>
+
 {% endblock %}
 
