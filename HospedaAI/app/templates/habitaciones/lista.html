@@ -1,47 +1,75 @@
 {% extends "base.html" %}
 
 {% block content %}
+<section class="crud-page">
+    <div class="container">
+        <div class="crud-header">
+            <div>
+                <p class="section-eyebrow">Gestion hotelera</p>
+                <h1 class="section-title">Habitaciones registradas</h1>
+                <p class="crud-subtitle">
+                    Consulta el inventario actual y administra cada habitacion desde un solo lugar.
+                </p>
+            </div>
+            <a href="{{ url_for('habitaciones.crear') }}" class="btn-gold">
+                <i class="fa fa-plus me-2"></i>Agregar habitacion
+            </a>
+        </div>
 
-<h2>Habitaciones</h2>
-
-<a href="/habitaciones/crear" class="btn btn-primary mb-3">
-    Nueva Habitación
-</a>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Número</th>
-            <th>Piso</th>
-            <th>Estado</th>
-            <th>Tipo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for h in habitaciones %}
-        <tr>
-            <td>{{ h.id }}</td>
-            <td>{{ h.numero }}</td>
-            <td>{{ h.piso }}</td>
-            <td>{{ h.estado }}</td>
-            <td>{{ h.tipo_habitacion.nombre }}</td>
-
-            <td>
-                <a href="/habitaciones/editar/{{ h.id }}" class="btn btn-warning btn-sm">Editar</a>
-
-                <a href="/habitaciones/eliminar/{{ h.id }}"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('¿Eliminar habitación?')">
-                   Eliminar
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-
-</table>
-
+        {% if habitaciones %}
+        <div class="crud-table-card">
+            <div class="table-responsive">
+                <table class="table crud-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Numero</th>
+                            <th>Estado</th>
+                            <th>Tipo</th>
+                            <th>Capacidad</th>
+                            <th>Precio por noche</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in habitaciones %}
+                        <tr>
+                            <td>#{{ h.id }}</td>
+                            <td>{{ h.numero }}</td>
+                            <td>
+                                <span class="status-pill status-{{ h.estado|lower }}">
+                                    {{ h.estado }}
+                                </span>
+                            </td>
+                            <td>{{ h.tipo.nombre if h.tipo else 'Sin tipo' }}</td>
+                            <td>{{ h.tipo.capacidad if h.tipo else '-' }} personas</td>
+                            <td>${{ h.tipo.precio_noche if h.tipo else '-' }}</td>
+                            <td class="text-end">
+                                <div class="crud-actions">
+                                    <a href="{{ url_for('habitaciones.editar', id=h.id) }}" class="btn btn-sm btn-outline-secondary">
+                                        Editar
+                                    </a>
+                                    <form method="POST" action="{{ url_for('habitaciones.eliminar', id=h.id) }}" onsubmit="return confirm('¿Eliminar habitacion?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="crud-empty-state">
+            <i class="fa fa-bed"></i>
+            <h2>No hay habitaciones registradas</h2>
+            <p>Empieza agregando la primera habitacion disponible para el hotel.</p>
+            <a href="{{ url_for('habitaciones.crear') }}" class="btn-gold">Crear primera habitacion</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

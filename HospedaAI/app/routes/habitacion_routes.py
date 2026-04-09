@@ -1,110 +1,94 @@
-from flask import Blueprint, request, jsonify, render_template, redirect
-from app.services.habitacion_service import HabitacionService
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
+
 from app.models.tipo_habitacion import TipoHabitacion
+from app.services.habitacion_service import HabitacionService
 
 habitacion_bp = Blueprint("habitaciones", __name__)
 
-# LISTAR
+
 @habitacion_bp.route("/habitaciones")
 def listar():
     habitaciones = HabitacionService.listar_habitaciones()
     return render_template("habitaciones/lista.html", habitaciones=habitaciones)
 
 
-# CREAR
 @habitacion_bp.route("/habitaciones/crear", methods=["GET", "POST"])
 def crear():
-
     if request.method == "POST":
-
         data = {
             "numero": request.form["numero"],
-            "piso": request.form["piso"],
             "estado": request.form["estado"],
-            "tipo_habitacion_id": request.form["tipo_habitacion_id"]
+            "tipo_id": request.form["tipo_id"],
         }
 
         HabitacionService.crear_habitacion(data)
-
-        return redirect("/habitaciones")
+        flash("Habitacion creada correctamente.", "success")
+        return redirect(url_for("habitaciones.listar"))
 
     tipos = TipoHabitacion.query.all()
-
     return render_template("habitaciones/crear.html", tipos=tipos)
 
 
-# EDITAR
 @habitacion_bp.route("/habitaciones/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
-
     habitacion = HabitacionService.obtener_habitacion(id)
+    tipos = TipoHabitacion.query.all()
+
+    if not habitacion:
+        flash("La habitacion que intentas editar no existe.", "warning")
+        return redirect(url_for("habitaciones.listar"))
 
     if request.method == "POST":
-
         data = {
             "numero": request.form["numero"],
-            "piso": request.form["piso"],
-            "estado": request.form["estado"]
+            "estado": request.form["estado"],
+            "tipo_id": request.form["tipo_id"],
         }
 
         HabitacionService.actualizar_habitacion(id, data)
+        flash("Habitacion actualizada correctamente.", "success")
+        return redirect(url_for("habitaciones.listar"))
 
-        return redirect("/habitaciones")
-
-    return render_template("habitaciones/editar.html", habitacion=habitacion)
+    return render_template("habitaciones/editar.html", habitacion=habitacion, tipos=tipos)
 
 
-# ELIMINAR
-@habitacion_bp.route("/habitaciones/eliminar/<int:id>")
+@habitacion_bp.route("/habitaciones/eliminar/<int:id>", methods=["POST"])
 def eliminar(id):
-
     HabitacionService.eliminar_habitacion(id)
+    flash("Habitacion eliminada correctamente.", "success")
+    return redirect(url_for("habitaciones.listar"))
 
-    return redirect("/habitaciones")
 
-# API GET
 @habitacion_bp.route("/api/habitaciones")
 def api_listar():
-
     habitaciones = HabitacionService.listar_habitaciones()
 
     return jsonify([
         {
             "id": h.id,
             "numero": h.numero,
-            "piso": h.piso,
-            "estado": h.estado
+            "estado": h.estado,
+            "tipo_id": h.tipo_id,
         }
         for h in habitaciones
     ])
 
 
-# API POST
 @habitacion_bp.route("/api/habitaciones", methods=["POST"])
 def api_crear():
-
     data = request.json
-
     habitacion = HabitacionService.crear_habitacion(data)
-
     return jsonify({"id": habitacion.id})
 
 
-# API PUT
 @habitacion_bp.route("/api/habitaciones/<int:id>", methods=["PUT"])
 def api_update(id):
-
     data = request.json
-
     habitacion = HabitacionService.actualizar_habitacion(id, data)
-
     return jsonify({"id": habitacion.id})
 
 
-# API DELETE
 @habitacion_bp.route("/api/habitaciones/<int:id>", methods=["DELETE"])
 def api_delete(id):
-
     HabitacionService.eliminar_habitacion(id)
-
     return jsonify({"message": "Habitacion eliminada"})
