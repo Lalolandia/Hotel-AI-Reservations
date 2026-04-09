@@ -31,18 +31,17 @@ def create_app():
     # 🔥 Importar blueprints
     from app.routes.auth import auth_bp
     from app.routes.main import main
-    from app.routes.reservas_routes import reservas_bp  # 👈 NUEVO
+    from app.routes.reservas_routes import reservas_bp
+    from app.routes.habitacion_routes import habitacion_bp  # 👈 mover aquí
 
     # 🔥 Registrar blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(main)
-    app.register_blueprint(reservas_bp)  # 👈 NUEVO
+    app.register_blueprint(reservas_bp)
+    app.register_blueprint(habitacion_bp)  # 👈 mover aquí
 
-    # Importar modelos para que Alembic los detecte
+    # Solo modelos dentro del contexto
     with app.app_context():
         from app import models
-        from app.routes.habitacion_routes import habitacion_bp
-
-        app.register_blueprint(habitacion_bp)
 
     return app

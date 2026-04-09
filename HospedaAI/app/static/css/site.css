@@ -1073,6 +1073,122 @@ img { max-width: 100%; display: block; }
 }
 
 /* ═══════════════════════════════════════
+   CHAT ASSISTANT
+═══════════════════════════════════════ */
+.chat-assistant-page {
+  padding: 140px 0 80px;
+}
+
+.chat-assistant-header {
+  margin-bottom: 28px;
+}
+
+.chat-assistant-subtitle {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.chat-assistant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.chat-assistant-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.chat-assistant-card h2 {
+  margin-bottom: 18px;
+}
+
+.chat-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.chat-form-grid label {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.chat-form-grid input {
+  width: 100%;
+  border: 1.5px solid #E2DDD8;
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+}
+
+.chat-form-grid input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,108,0.12);
+}
+
+.chat-form-full {
+  grid-column: span 2;
+}
+
+.chat-empty {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.chat-message {
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.chat-errors {
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fff6f6;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.chat-errors p {
+  margin-bottom: 6px;
+  color: #991b1b;
+}
+
+.chat-errors ul {
+  margin: 0;
+  color: #991b1b;
+}
+
+.chat-room-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.chat-room-card h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.chat-room-card p {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.chat-alt-list h3 {
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+
+/* ═══════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════ */
 @media (max-width: 991px) {
@@ -1089,6 +1205,9 @@ img { max-width: 100%; display: block; }
 
   .hero-scroll-hint { display: none; }
   .hero-stats { gap: 20px; }
+  .chat-assistant-grid { grid-template-columns: 1fr; }
+  .chat-form-grid { grid-template-columns: 1fr; }
+  .chat-form-full { grid-column: span 1; }
 }
 
 @media (max-width: 576px) {

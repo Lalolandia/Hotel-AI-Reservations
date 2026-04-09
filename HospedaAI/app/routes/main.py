@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for
 from sqlalchemy import or_
 
 from app.models import Habitacion, Paquete, TipoHabitacion
+from app.ai import ChatAssistantService
 
 main = Blueprint('main', __name__)
 
@@ -61,4 +62,12 @@ def search():
 
 @main.route('/chat')
 def chat():
-    return render_template('chat.html')
+    return render_template('chatAI/chat.html')
+
+
+@main.route('/api/chat/recommendation', methods=['POST'])
+def chat_recommendation():
+    payload = request.get_json(silent=True) or {}
+    result = ChatAssistantService.recommend(payload)
+    status_code = 200 if result.get("ok", False) else 400
+    return jsonify(result), status_code
