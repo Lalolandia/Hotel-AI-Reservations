@@ -22,14 +22,29 @@ class LoginForm(FlaskForm):
 
 
 class ForgotPasswordForm(FlaskForm):
-    """Paso 1: usuario ingresa su correo."""
     correo = StringField('Correo electrónico', validators=[DataRequired(), Email()])
     submit = SubmitField('Enviar código')
 
 
 class ResetPasswordForm(FlaskForm):
-    """Paso 2: usuario ingresa el código + nueva contraseña."""
     codigo    = StringField('Código de verificación', validators=[DataRequired(), Length(min=6, max=6)])
     password  = PasswordField('Nueva contraseña',     validators=[DataRequired(), Length(min=6)])
     password2 = PasswordField('Confirmar contraseña', validators=[DataRequired(), EqualTo('password', message='Las contraseñas no coinciden.')])
     submit    = SubmitField('Cambiar contraseña')
+
+
+class ProfileForm(FlaskForm):
+    """Formulario para editar datos del perfil (sin cambiar correo ni contraseña)."""
+    nombre   = StringField('Nombre completo', validators=[DataRequired(), Length(max=100)])
+    telefono = StringField('Teléfono',        validators=[Optional(), Length(max=20)])
+    edad     = IntegerField('Edad',           validators=[Optional(), NumberRange(min=0, max=120)])
+    genero   = SelectField('Género',          choices=[('', 'Seleccionar'), ('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')])
+    submit   = SubmitField('Guardar cambios')
+
+
+class ChangePasswordForm(FlaskForm):
+    """Formulario para cambiar contraseña desde el perfil."""
+    password_actual  = PasswordField('Contraseña actual',    validators=[DataRequired()])
+    password_nueva   = PasswordField('Nueva contraseña',     validators=[DataRequired(), Length(min=6)])
+    password_confirm = PasswordField('Confirmar contraseña', validators=[DataRequired(), EqualTo('password_nueva', message='Las contraseñas no coinciden.')])
+    submit           = SubmitField('Cambiar contraseña')

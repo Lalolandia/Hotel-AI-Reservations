@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}{{ room.tipo.nombre if room.tipo else 'Habitación' }} #{{ room.numero }} — HotelAI{% endblock %}
+
+{% block content %}
+<div style="padding-top: 80px;">
+  <div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav class="detail-breadcrumb">
+      <a href="{{ url_for('main.index') }}">Inicio</a>
+      <i class="fa fa-chevron-right"></i>
+      <a href="{{ url_for('main.rooms') }}">Habitaciones</a>
+      <i class="fa fa-chevron-right"></i>
+      <span>{{ room.tipo.nombre if room.tipo else 'Habitación' }} #{{ room.numero }}</span>
+    </nav>
+
+    <div class="detail-layout">
+
+      <!-- ══ IZQUIERDA: imagen + info ══ -->
+      <div class="detail-main">
+
+        <!-- Imagen principal -->
+        <div class="detail-img-container">
+          <div class="detail-img-placeholder">
+            <img src="{{ url_for('static', filename='img/rooms' ~ room.numero ~ '.png') }}"
+                 alt="Habitación {{ room.numero }}"
+                 class="detail-img">
+          </div>
+          <span class="room-badge room-badge-{{ room.estado }} detail-badge">
+            {{ room.estado | capitalize }}
+          </span>
+        </div>
+
+        <!-- Título y descripción -->
+        <div class="detail-body">
+          <div class="detail-title-row">
+            <div>
+              <p class="section-eyebrow mb-1">✦ Piso {{ room.piso or '—' }}</p>
+              <h1 class="detail-title">
+                {{ room.tipo.nombre if room.tipo else 'Habitación' }}
+                <span class="detail-numero">#{{ room.numero }}</span>
+              </h1>
+            </div>
+            <div class="detail-price-hero">
+              <span class="price-amount">${{ room.tipo.precio_noche if room.tipo else '—' }}</span>
+              <span class="price-night">/ noche</span>
+            </div>
+          </div>
+
+          {% if room.tipo and room.tipo.descripcion %}
+          <p class="detail-description">{{ room.tipo.descripcion }}</p>
+          {% endif %}
+
+          <!-- Características -->
+          <div class="detail-features">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fa fa-user-group"></i></div>
+              <div>
+                <strong>Capacidad</strong>
+                <span>{{ room.tipo.capacidad if room.tipo else (room.capacidad or '—') }} persona(s)</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fa fa-layer-group"></i></div>
+              <div>
+                <strong>Piso</strong>
+                <span>{{ room.piso or '—' }}</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fa fa-door-open"></i></div>
+              <div>
+                <strong>Número</strong>
+                <span>{{ room.numero }}</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fa fa-circle-check"></i></div>
+              <div>
+                <strong>Estado</strong>
+                <span>{{ room.estado | capitalize }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Servicios incluidos -->
+          <div class="detail-amenities">
+            <h5>Servicios incluidos</h5>
+            <div class="amenities-list">
+              <span><i class="fa fa-wifi"></i> WiFi gratis</span>
+              <span><i class="fa fa-snowflake"></i> Aire acondicionado</span>
+              <span><i class="fa fa-tv"></i> Smart TV</span>
+              <span><i class="fa fa-mug-saucer"></i> Desayuno incluido</span>
+              <span><i class="fa fa-shirt"></i> Servicio de lavandería</span>
+              <span><i class="fa fa-car"></i> Estacionamiento</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DERECHA: reserva ══ -->
+      <div class="detail-sidebar">
+        <div class="booking-card">
+          <div class="booking-card-header">
+            <span class="price-amount">${{ room.tipo.precio_noche if room.tipo else '—' }}</span>
+            <span class="price-night">/ noche</span>
+          </div>
+
+          {% if room.estado == 'disponible' %}
+            {% if current_user.is_authenticated %}
+              <form action="#" method="post" class="booking-form-detail">
+                <div class="booking-field-v">
+                  <label><i class="fa fa-calendar"></i> Fechas</label>
+                  <input type="text" name="dates" class="input-luxury date-picker"
+                         placeholder="Check-in → Check-out" required>
+                </div>
+                <div class="booking-field-v">
+                  <label><i class="fa fa-user-group"></i> Huéspedes</label>
+                  <select name="personas" class="input-luxury select-luxury">
+                    {% for i in range(1, (room.tipo.capacidad if room.tipo else 6) + 1) %}
+                      <option value="{{ i }}">{{ i }} persona{{ 's' if i > 1 else '' }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <button type="submit" class="btn-gold w-100 btn-submit">
+                  <i class="fa fa-calendar-check me-2"></i>Reservar ahora
+                </button>
+              </form>
+            {% else %}
+              <p class="booking-login-msg">
+                Debes iniciar sesión para reservar esta habitación.
+              </p>
+              <a href="{{ url_for('auth.login', next=request.url) }}"
+                 class="btn-gold w-100 text-center">
+                <i class="fa fa-right-to-bracket me-2"></i>Iniciar sesión
+              </a>
+              <a href="{{ url_for('auth.register') }}"
+                 class="btn-ghost w-100 text-center mt-2">
+                Crear cuenta gratis
+              </a>
+            {% endif %}
+
+          {% else %}
+            <div class="booking-unavailable">
+              <i class="fa fa-circle-xmark"></i>
+              <p>Esta habitación no está disponible en este momento.</p>
+            </div>
+            <a href="{{ url_for('main.rooms') }}" class="btn-gold w-100 text-center">
+              Ver otras habitaciones
+            </a>
+          {% endif %}
+
+          <!-- Info adicional -->
+          <div class="booking-perks">
+            <div><i class="fa fa-rotate-left"></i> Cancelación gratuita</div>
+            <div><i class="fa fa-shield-halved"></i> Pago seguro</div>
+            <div><i class="fa fa-headset"></i> Soporte 24/7</div>
+          </div>
+        </div>
+
+        <!-- IA sugerencia -->
+        <div class="ai-suggest-card">
+          <i class="fa fa-robot"></i>
+          <div>
+            <strong>¿Tienes dudas?</strong>
+            <p>Nuestro asistente IA puede ayudarte a elegir.</p>
+          </div>
+          <a href="{{ url_for('main.chat') }}" class="btn-ghost">Chatear</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

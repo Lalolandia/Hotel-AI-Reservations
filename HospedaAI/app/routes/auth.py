@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from app import db, login_manager
 from app.models.cliente import Cliente
-from app.forms import RegisterForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
+from app.forms import RegisterForm, LoginForm, ForgotPasswordForm, ResetPasswordForm, ProfileForm, ChangePasswordForm
 from app.email import send_confirmation_email, send_reset_password_email
 from app.utils import confirm_token, generate_reset_code, generate_reset_token, verify_reset_token
 from flask_login import login_user, logout_user, current_user, login_required
@@ -38,7 +38,7 @@ def register():
         db.session.commit()
 
         send_confirmation_email(user.correo)
-        flash("¡Cuenta creada! Revisa tu correo para confirmar tu cuenta.", "success")
+        flash("¡Cuenta creada! Revisa tu correo para confirmarla.", "success")
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', form=form)
@@ -85,7 +85,7 @@ def login():
             return render_template('auth/login.html', form=form)
 
         if not user.correo_confirmado:
-            flash("Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja.", "warning")
+            flash("Debes confirmar tu correo antes de iniciar sesión.", "warning")
             return render_template('auth/login.html', form=form)
 
         login_user(user)
@@ -109,13 +109,53 @@ def logout():
 
 
 # ════════════════════════════════════════
-#  PERFIL
+#  PERFIL — Ver y editar datos
 # ════════════════════════════════════════
 
-@auth_bp.route('/profile')
+@auth_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    return render_template('auth/profile.html')
+    form = ProfileForm()
+
+    if form.validate_on_submit():
+        current_user.nombre   = form.nombre.data
+        current_user.telefono = form.telefono.data
+        current_user.edad     = form.edad.data
+        current_user.genero   = form.genero.data
+        db.session.commit()
+        flash("¡Perfil actualizado correctamente!", "success")
+        return redirect(url_for('auth.profile'))
+
+    # Prellenar el formulario con los datos actuales
+    if request.method == 'GET':
+        form.nombre.data   = current_user.nombre
+        form.telefono.data = current_user.telefono
+        form.edad.data     = current_user.edad
+        form.genero.data   = current_user.genero
+
+    return render_template('auth/profile.html', form=form)
+
+
+# ════════════════════════════════════════
+#  PERFIL — Cambiar contraseña
+# ════════════════════════════════════════
+
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        if not current_user.check_password(form.password_actual.data):
+            flash("La contraseña actual es incorrecta.", "danger")
+            return render_template('auth/change_password.html', form=form)
+
+        current_user.set_password(form.password_nueva.data)
+        db.session.commit()
+        flash("¡Contraseña actualizada correctamente! 🔐", "success")
+        return redirect(url_for('auth.profile'))
+
+    return render_template('auth/change_password.html', form=form)
 
 
 # ════════════════════════════════════════
@@ -132,7 +172,6 @@ def forgot_password():
         correo = form.correo.data.lower()
         user   = Cliente.query.filter_by(correo=correo).first()
 
-        # Mismo mensaje siempre — no revelar si el correo existe
         flash("Si ese correo está registrado, recibirás un código en breve.", "info")
 
         if user:
@@ -178,7 +217,7 @@ def reset_password():
         db.session.commit()
         session.pop('reset_token', None)
 
-        flash("¡Contraseña actualizada exitosamente! Ya puedes iniciar sesión. 🔐", "success")
+        flash("¡Contraseña actualizada exitosamente! 🔐", "success")
         return redirect(url_for('auth.login'))
 
     return render_template('auth/reset_password.html', form=form)

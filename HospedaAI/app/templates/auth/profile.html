@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Mi Perfil — HotelAI{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <div class="container py-5" style="padding-top: 120px !important;">
+
+    <!-- Header del perfil -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        {{ current_user.nombre[0].upper() }}
+      </div>
+      <div class="profile-info">
+        <h1>{{ current_user.nombre }}</h1>
+        <p class="profile-correo">
+          <i class="fa fa-envelope"></i> {{ current_user.correo }}
+          {% if current_user.correo_confirmado %}
+            <span class="badge-verified"><i class="fa fa-circle-check"></i> Verificado</span>
+          {% else %}
+            <span class="badge-pending"><i class="fa fa-clock"></i> Pendiente</span>
+          {% endif %}
+        </p>
+        <p class="profile-since">
+          <i class="fa fa-calendar"></i>
+          Miembro desde {{ current_user.fecha_registro.strftime('%B %Y') if current_user.fecha_registro else '—' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+
+      <!-- ── Editar datos personales ── -->
+      <div class="profile-card">
+        <div class="profile-card-header">
+          <i class="fa fa-user-pen"></i>
+          <h4>Datos personales</h4>
+        </div>
+        <form method="post" action="{{ url_for('auth.profile') }}" novalidate>
+          {{ form.hidden_tag() }}
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-user"></i> Nombre completo</label>
+            {{ form.nombre(class="input-luxury" + (" input-error" if form.nombre.errors else ""), placeholder="Tu nombre completo") }}
+            {% for e in form.nombre.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-phone"></i> Teléfono</label>
+            {{ form.telefono(class="input-luxury" + (" input-error" if form.telefono.errors else ""), placeholder="+506 8888-8888") }}
+            {% for e in form.telefono.errors %}
+              <span class="field-error">{{ e }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-row-two">
+            <div class="form-group-luxury">
+              <label><i class="fa fa-cake-candles"></i> Edad</label>
+              {{ form.edad(class="input-luxury" + (" input-error" if form.edad.errors else ""), placeholder="25") }}
+              {% for e in form.edad.errors %}
+                <span class="field-error">{{ e }}</span>
+              {% endfor %}
+            </div>
+
+            <div class="form-group-luxury">
+              <label><i class="fa fa-venus-mars"></i> Género</label>
+              {{ form.genero(class="input-luxury select-luxury") }}
+            </div>
+          </div>
+
+          <!-- Correo (solo lectura) -->
+          <div class="form-group-luxury">
+            <label><i class="fa fa-envelope"></i> Correo electrónico</label>
+            <input class="input-luxury input-readonly" type="text"
+                   value="{{ current_user.correo }}" disabled>
+            <span class="field-hint">El correo no se puede cambiar</span>
+          </div>
+
+          <button type="submit" class="btn-gold w-100 mt-3">
+            <i class="fa fa-floppy-disk me-2"></i>Guardar cambios
+          </button>
+        </form>
+      </div>
+
+      <!-- ── Panel derecho ── -->
+      <div class="profile-right">
+
+        <!-- Resumen de cuenta -->
+        <div class="profile-card profile-summary">
+          <div class="profile-card-header">
+            <i class="fa fa-chart-simple"></i>
+            <h4>Resumen</h4>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-num">{{ current_user.reservas | length if current_user.reservas else 0 }}</span>
+              <span class="summary-label">Reservas</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-num">
+                {% if current_user.genero == 'M' %}Masculino
+                {% elif current_user.genero == 'F' %}Femenino
+                {% elif current_user.genero == 'O' %}Otro
+                {% else %}—{% endif %}
+              </span>
+              <span class="summary-label">Género</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-num">{{ current_user.edad or '—' }}</span>
+              <span class="summary-label">Edad</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-num">{{ current_user.telefono or '—' }}</span>
+              <span class="summary-label">Teléfono</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cambiar contraseña -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <i class="fa fa-lock"></i>
+            <h4>Seguridad</h4>
+          </div>
+          <p style="font-size:14px; color:var(--muted); margin-bottom:20px;">
+            Mantén tu cuenta segura con una contraseña fuerte.
+          </p>
+          <a href="{{ url_for('auth.change_password') }}" class="btn-ghost w-100 text-center">
+            <i class="fa fa-key me-2"></i>Cambiar contraseña
+          </a>
+        </div>
+
+        <!-- Cerrar sesión -->
+        <div class="profile-card profile-danger">
+          <div class="profile-card-header">
+            <i class="fa fa-right-from-bracket"></i>
+            <h4>Sesión</h4>
+          </div>
+          <p style="font-size:14px; color:var(--muted); margin-bottom:20px;">
+            ¿Listo para salir? Cierra tu sesión de forma segura.
+          </p>
+          <a href="{{ url_for('auth.logout') }}" class="btn-logout w-100 text-center">
+            <i class="fa fa-right-from-bracket me-2"></i>Cerrar sesión
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
