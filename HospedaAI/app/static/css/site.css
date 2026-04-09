@@ -970,3 +970,30 @@ img { max-width: 100%; display: block; }
   .amenities-grid { grid-template-columns: 1fr; }
   .auth-form-container { max-width: 100%; }
 }
+
+/* ── Extra: código input y hints ─── */
+.input-code {
+  font-size: 28px;
+  letter-spacing: 12px;
+  text-align: center;
+  font-family: monospace;
+  font-weight: 700;
+}
+.field-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Login: link olvide contraseña ─── */
+.forgot-link {
+  text-align: right;
+  font-size: 13px;
+  margin-top: -12px;
+}
+.forgot-link a {
+  color: var(--gold);
+  transition: color 0.2s;
+}
+.forgot-link a:hover { color: var(--gold-dark); }

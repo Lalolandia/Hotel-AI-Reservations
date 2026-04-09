@@ -34,3 +34,4 @@ def search():
 @main.route('/chat')
 def chat():
     return render_template('chat.html')
+

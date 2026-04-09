@@ -9,12 +9,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Email
-    MAIL_SERVER = os.getenv("MAIL_SERVER")
-    MAIL_PORT = int(os.getenv("MAIL_PORT") or 25)
-    MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-    MAIL_USE_TLS = os.getenv("MAIL_USE_TLS", "False") == "True"
-    MAIL_USE_SSL = os.getenv("MAIL_USE_SSL", "False") == "True"
-    MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "noreply@hospedai.com")
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "noreply@hospedai.com")
+
 
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT") or "other-secret-salt"
+    RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'onboarding@resend.dev')

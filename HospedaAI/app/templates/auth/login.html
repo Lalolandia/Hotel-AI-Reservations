@@ -76,6 +76,10 @@
           {% endfor %}
         </div>
 
+        <div class="forgot-link">
+          <a href="{{ url_for('auth.forgot_password') }}">¿Olvidaste tu contraseña?</a>
+        </div>
+
         <button type="submit" class="btn-gold w-100 btn-submit">
           Iniciar sesión <i class="fa fa-arrow-right ms-2"></i>
         </button>
