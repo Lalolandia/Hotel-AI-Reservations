@@ -1,0 +1,51 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Tipos de habitación — Admin{% endblock %}
+{% block page_title %}Tipos de habitación{% endblock %}
+
+{% block content %}
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>{{ tipos|length }} tipos registrados</h5>
+    <a href="{{ url_for('admin.crear_tipo') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nuevo tipo</a>
+  </div>
+  {% if tipos %}
+  <table class="admin-table">
+    <thead>
+      <tr><th>Imagen</th><th>Nombre</th><th>Capacidad</th><th>Precio/noche</th><th>Habitaciones</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for t in tipos %}
+      <tr>
+        <td>
+          {% if t.imagen %}
+            <img src="{{ t.imagen }}" class="room-thumb">
+          {% else %}
+            <div class="room-thumb-placeholder"><i class="fa fa-image"></i></div>
+          {% endif %}
+        </td>
+        <td>
+          <strong>{{ t.nombre }}</strong>
+          {% if t.descripcion %}
+          <p style="font-size:12px;color:#9CA3AF;margin:2px 0 0">{{ t.descripcion[:60] }}...</p>
+          {% endif %}
+        </td>
+        <td>{{ t.capacidad }} persona(s)</td>
+        <td style="font-weight:600">${{ t.precio_noche }}</td>
+        <td>{{ t.habitaciones|length }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a href="{{ url_for('admin.editar_tipo', id=t.id) }}" class="btn-admin-edit"><i class="fa fa-pen"></i> Editar</a>
+            <form method="POST" action="{{ url_for('admin.eliminar_tipo', id=t.id) }}" onsubmit="return confirm('¿Eliminar?')">
+              <button type="submit" class="btn-admin-danger"><i class="fa fa-trash"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:40px;text-align:center;color:#9CA3AF;">No hay tipos. <a href="{{ url_for('admin.crear_tipo') }}" style="color:var(--gold)">Crear el primero</a></div>
+  {% endif %}
+</div>
+{% endblock %}

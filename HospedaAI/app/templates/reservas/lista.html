@@ -1,91 +1,88 @@
 {% extends "base.html" %}
+{% block title %}Mis reservas — HotelAI{% endblock %}
 
 {% block content %}
-<section class="crud-page">
+<div style="padding-top: 80px;">
+
+  <div class="rooms-page-header">
     <div class="container">
-
-        <div class="crud-header">
-            <div>
-                <p class="section-eyebrow">Gestion hotelera</p>
-                <h1 class="section-title">Reservas registradas</h1>
-                <p class="crud-subtitle">
-                    Consulta las reservas creadas y administra la informacion principal desde un solo lugar.
-                </p>
-            </div>
-
-            <a href="{{ url_for('reservas.crear_reserva') }}" class="btn-gold">
-                <i class="fa fa-plus me-2"></i>Crear reserva
-            </a>
-        </div>
-
-        {% if reservas %}
-        <div class="crud-table-card">
-            <div class="table-responsive">
-                <table class="table crud-table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Cliente</th>
-                            <th>Habitación</th>
-                            <th>Fecha inicio</th>
-                            <th>Fecha fin</th>
-                            <th>Total</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for r in reservas %}
-                        <tr>
-                            <td>#{{ r.id }}</td>
-
-                            <td>
-                                {{ r.cliente.nombre if r.cliente else r.cliente_id }}
-                            </td>
-
-                            <td>
-                                {{ r.habitacion.numero if r.habitacion else r.habitacion_id }}
-                            </td>
-
-                            <td>{{ r.fecha_inicio }}</td>
-                            <td>{{ r.fecha_fin }}</td>
-
-                            <td class="fw-bold text-success">
-                                ${{ r.total }}
-                            </td>
-
-                            <td class="text-end">
-                                <div class="crud-actions">
-                                    <a href="{{ url_for('reservas.detalle_reserva', id=r.id) }}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Ver detalle
-                                    </a>
-
-                                    <a href="{{ url_for('reservas.cancelar_reserva', id=r.id) }}"
-                                       class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('¿Cancelar esta reserva?');">
-                                        Cancelar
-                                    </a>
-                                </div>
-                            </td>
-
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {% else %}
-        <div class="crud-empty-state">
-            <i class="fa fa-calendar-check"></i>
-            <h2>No hay reservas registradas</h2>
-            <p>Empieza creando la primera reserva para visualizarla aquí.</p>
-            <a href="{{ url_for('reservas.crear_reserva') }}" class="btn-gold">
-                Crear primera reserva
-            </a>
-        </div>
-        {% endif %}
-
+      <p class="section-eyebrow">✦ Mi cuenta</p>
+      <h1 class="section-title text-white">Mis reservas</h1>
+      <p style="color:rgba(255,255,255,0.6); font-size:16px; margin-top:8px;">
+        Historial y estado de todas tus reservas
+      </p>
     </div>
-</section>
+  </div>
+
+  <div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="results-count mb-0">
+        <strong>{{ reservas|length }}</strong>
+        reserva{{ 's' if reservas|length != 1 else '' }}
+      </p>
+      <a href="{{ url_for('reservas.crear_reserva') }}" class="btn-gold">
+        <i class="fa fa-plus me-2"></i>Nueva reserva
+      </a>
+    </div>
+
+    {% if reservas %}
+    <div class="reservas-grid">
+      {% for r in reservas %}
+
+      {% set hoy = namespace(d=none) %}
+      {% set es_pasada = r.fecha_fin.strftime('%Y-%m-%d') < now %}
+      {% set es_activa = r.fecha_inicio.strftime('%Y-%m-%d') <= now and r.fecha_fin.strftime('%Y-%m-%d') >= now %}
+      {% set noches = (r.fecha_fin - r.fecha_inicio).days %}
+
+      <div class="reserva-card">
+        <div class="reserva-card-header">
+          <div>
+            <span class="reserva-id">#{{ r.id }}</span>
+            <h5>{{ r.habitacion.tipo.nombre if r.habitacion and r.habitacion.tipo else 'Habitación' }}</h5>
+            <p>Habitación {{ r.habitacion.numero if r.habitacion else '—' }} · Piso {{ r.habitacion.piso if r.habitacion else '—' }}</p>
+          </div>
+          <div class="reserva-precio">
+            <span>${{ r.total }}</span>
+            <small>{{ noches }} noche{{ 's' if noches != 1 else '' }}</small>
+          </div>
+        </div>
+
+        <div class="reserva-card-body">
+          <div class="reserva-fechas">
+            <div class="reserva-fecha">
+              <span class="fecha-label">Check-in</span>
+              <span class="fecha-val">{{ r.fecha_inicio.strftime('%d %b %Y') }}</span>
+            </div>
+            <i class="fa fa-arrow-right" style="color:var(--gold); font-size:12px;"></i>
+            <div class="reserva-fecha">
+              <span class="fecha-label">Check-out</span>
+              <span class="fecha-val">{{ r.fecha_fin.strftime('%d %b %Y') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reserva-card-footer">
+          <a href="{{ url_for('reservas.detalle_reserva', id=r.id) }}"
+             class="btn-ghost btn-sm-reserva">
+            Ver detalle
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="no-results">
+      <i class="fa fa-calendar-xmark"></i>
+      <h4>No tienes reservas aún</h4>
+      <p>Explora nuestras habitaciones y haz tu primera reserva.</p>
+      <a href="{{ url_for('main.rooms') }}" class="btn-gold">
+        Ver habitaciones
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
 {% endblock %}

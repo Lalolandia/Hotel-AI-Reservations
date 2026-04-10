@@ -8,27 +8,24 @@ class Cliente(UserMixin, db.Model):
 
     __tablename__ = "clientes"
 
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-
-    # Campo unificado: usamos 'correo' en toda la app
-    correo = db.Column(db.String(120), unique=True, nullable=False)
-
-    telefono = db.Column(db.String(20))
-    edad = db.Column(db.Integer)
-    genero = db.Column(db.String(20))
+    id            = db.Column(db.Integer, primary_key=True)
+    nombre        = db.Column(db.String(100), nullable=False)
+    correo        = db.Column(db.String(120), unique=True, nullable=False)
+    telefono      = db.Column(db.String(20))
+    edad          = db.Column(db.Integer)
+    genero        = db.Column(db.String(20))
     password_hash = db.Column(db.String(256))
 
-    correo_confirmado = db.Column(db.Boolean, default=False)
+    correo_confirmado    = db.Column(db.Boolean, default=False)
     correo_confirmado_en = db.Column(db.DateTime, nullable=True)
+    fecha_registro       = db.Column(db.DateTime, default=datetime.utcnow)
 
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    es_admin = db.Column(db.Boolean, default=False)  # panel administrativo
 
     # Relaciones
     reservas = db.relationship("Reserva", backref="cliente", lazy=True)
-    chats = db.relationship("Chat", backref="cliente", lazy=True)
+    chats    = db.relationship("Chat",    backref="cliente", lazy=True)
 
-    # Flask-Login requiere get_id()
     def get_id(self):
         return str(self.id)
 

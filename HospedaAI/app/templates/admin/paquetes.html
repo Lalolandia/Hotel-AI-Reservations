@@ -1,0 +1,38 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Paquetes — Admin{% endblock %}
+{% block page_title %}Paquetes turísticos{% endblock %}
+
+{% block content %}
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>{{ paquetes|length }} paquetes</h5>
+    <a href="{{ url_for('admin.crear_paquete') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nuevo paquete</a>
+  </div>
+  {% if paquetes %}
+  <table class="admin-table">
+    <thead>
+      <tr><th>Nombre</th><th>Descripción</th><th>Precio total</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for p in paquetes %}
+      <tr>
+        <td><strong>{{ p.nombre }}</strong></td>
+        <td style="color:#6B7280;font-size:13px;">{{ p.descripcion[:80] if p.descripcion else '—' }}{% if p.descripcion and p.descripcion|length > 80 %}...{% endif %}</td>
+        <td style="font-weight:600;color:#059669">${{ p.precio_total }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a href="{{ url_for('admin.editar_paquete', id=p.id) }}" class="btn-admin-edit"><i class="fa fa-pen"></i> Editar</a>
+            <form method="POST" action="{{ url_for('admin.eliminar_paquete', id=p.id) }}" onsubmit="return confirm('¿Eliminar?')">
+              <button type="submit" class="btn-admin-danger"><i class="fa fa-trash"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:40px;text-align:center;color:#9CA3AF;">No hay paquetes. <a href="{{ url_for('admin.crear_paquete') }}" style="color:var(--gold)">Crear el primero</a></div>
+  {% endif %}
+</div>
+{% endblock %}

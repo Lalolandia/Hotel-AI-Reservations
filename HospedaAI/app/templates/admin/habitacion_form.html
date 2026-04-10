@@ -1,0 +1,48 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ accion }} habitación — Admin{% endblock %}
+{% block page_title %}{{ accion }} habitación{% endblock %}
+
+{% block content %}
+<div class="admin-form-card">
+  <h4>{{ accion }} habitación</h4>
+  <form method="POST">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Número *</label>
+        <input type="text" name="numero" required value="{{ habitacion.numero if habitacion else '' }}" placeholder="101">
+      </div>
+      <div class="form-group">
+        <label>Piso</label>
+        <input type="number" name="piso" min="1" value="{{ habitacion.piso if habitacion else '' }}" placeholder="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Estado *</label>
+        <select name="estado" required>
+          {% for estado in ['disponible', 'ocupada', 'mantenimiento'] %}
+          <option value="{{ estado }}" {{ 'selected' if habitacion and habitacion.estado == estado }}>{{ estado | capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Capacidad</label>
+        <input type="number" name="capacidad" min="1" value="{{ habitacion.capacidad if habitacion else '' }}" placeholder="2">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Tipo de habitación *</label>
+      <select name="tipo_id" required>
+        <option value="">Seleccionar tipo</option>
+        {% for t in tipos %}
+        <option value="{{ t.id }}" {{ 'selected' if habitacion and habitacion.tipo_id == t.id }}>{{ t.nombre }} — ${{ t.precio_noche }}/noche</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-admin-gold"><i class="fa fa-floppy-disk"></i> {{ accion }}</button>
+      <a href="{{ url_for('admin.listar_habitaciones') }}" class="btn-admin-ghost">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

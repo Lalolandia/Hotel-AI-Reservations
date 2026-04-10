@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Panel Admin — HotelAI{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root { --gold:#C9A86C; --dark:#0F0E0C; --sidebar-w:240px; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#F4F5F7;display:flex;min-height:100vh}
+    .admin-sidebar{width:var(--sidebar-w);background:var(--dark);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+    .sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .sidebar-brand .brand-name{font-size:20px;font-weight:600;color:#fff}
+    .sidebar-brand .brand-name span{color:var(--gold)}
+    .sidebar-brand small{color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+    .sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
+    .nav-section-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:12px 20px 6px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;transition:all .2s;border-left:3px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{color:#fff;background:rgba(201,168,108,0.1);border-left-color:var(--gold)}
+    .sidebar-nav a i{width:16px;text-align:center;font-size:13px}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)}
+    .sidebar-footer a{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;transition:color .2s}
+    .sidebar-footer a:hover{color:#fff}
+    .admin-main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .admin-topbar{background:#fff;padding:16px 28px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between}
+    .admin-topbar h1{font-size:20px;font-weight:600;color:#111}
+    .admin-user{display:flex;align-items:center;gap:10px;font-size:14px;color:#555}
+    .admin-avatar{width:32px;height:32px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+    .admin-content{padding:28px;flex:1}
+    .flash-bar{margin:0 28px 16px}
+    .stat-card{background:#fff;border-radius:12px;padding:20px 24px;border:1px solid #E5E7EB}
+    .stat-card .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+    .stat-card .stat-num{font-size:28px;font-weight:700;color:#111;line-height:1}
+    .stat-card .stat-label{font-size:13px;color:#888;margin-top:4px}
+    .admin-table-card{background:#fff;border-radius:12px;border:1px solid #E5E7EB;overflow:hidden}
+    .admin-table-header{padding:18px 24px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between}
+    .admin-table-header h5{font-size:16px;font-weight:600;margin:0}
+    .admin-table{width:100%;border-collapse:collapse}
+    .admin-table th{background:#F9FAFB;padding:12px 16px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6B7280;border-bottom:1px solid #E5E7EB;text-align:left}
+    .admin-table td{padding:12px 16px;font-size:14px;color:#374151;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+    .admin-table tr:last-child td{border-bottom:none}
+    .admin-table tr:hover td{background:#F9FAFB}
+    .admin-form-card{background:#fff;border-radius:12px;padding:28px;border:1px solid #E5E7EB;max-width:640px}
+    .admin-form-card h4{font-size:18px;font-weight:600;margin-bottom:24px}
+    .form-group{margin-bottom:18px}
+    .form-group label{font-size:13px;font-weight:500;color:#374151;margin-bottom:6px;display:block}
+    .form-group input,.form-group select,.form-group textarea{width:100%;border:1.5px solid #D1D5DB;border-radius:8px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+    .form-group textarea{resize:vertical;min-height:80px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-actions{display:flex;gap:10px;margin-top:24px}
+    .badge-disponible{background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:20px;font-size:12px}
+    .badge-ocupada{background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:20px;font-size:12px}
+    .badge-mantenimiento{background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:20px;font-size:12px}
+    .badge-admin{background:#EDE9FE;color:#5B21B6;padding:3px 10px;border-radius:20px;font-size:12px}
+    .badge-normal{background:#F3F4F6;color:#6B7280;padding:3px 10px;border-radius:20px;font-size:12px}
+    .btn-admin-gold{background:var(--gold);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s}
+    .btn-admin-gold:hover{background:#9E7A45;color:#fff}
+    .btn-admin-ghost{background:transparent;color:#6B7280;border:1.5px solid #D1D5DB;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+    .btn-admin-ghost:hover{border-color:#9CA3AF;color:#374151}
+    .btn-admin-danger{background:transparent;color:#EF4444;border:1.5px solid #FECACA;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
+    .btn-admin-danger:hover{background:#FEF2F2;border-color:#EF4444}
+    .btn-admin-edit{background:transparent;color:#3B82F6;border:1.5px solid #BFDBFE;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
+    .btn-admin-edit:hover{background:#EFF6FF;border-color:#3B82F6}
+    .room-thumb{width:48px;height:36px;border-radius:6px;object-fit:cover}
+    .room-thumb-placeholder{width:48px;height:36px;border-radius:6px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:14px}
+  </style>
+</head>
+<body>
+
+<aside class="admin-sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Hotel<span>AI</span></div>
+    <small>Panel administrativo</small>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">General</div>
+    <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">
+      <i class="fa fa-gauge"></i> Dashboard
+    </a>
+    <div class="nav-section-label">Gestión</div>
+    <a href="{{ url_for('admin.listar_tipos') }}" class="{{ 'active' if 'tipo' in request.endpoint }}">
+      <i class="fa fa-tags"></i> Tipos de habitación
+    </a>
+    <a href="{{ url_for('admin.listar_habitaciones') }}" class="{{ 'active' if 'habitacion' in request.endpoint }}">
+      <i class="fa fa-bed"></i> Habitaciones
+    </a>
+    <a href="{{ url_for('admin.listar_paquetes') }}" class="{{ 'active' if 'paquete' in request.endpoint }}">
+      <i class="fa fa-box"></i> Paquetes
+    </a>
+    <a href="{{ url_for('admin.listar_reservas') }}" class="{{ 'active' if 'reserva' in request.endpoint }}">
+      <i class="fa fa-calendar-check"></i> Reservas
+    </a>
+    <div class="nav-section-label">Usuarios</div>
+    <a href="{{ url_for('admin.listar_clientes') }}" class="{{ 'active' if 'cliente' in request.endpoint }}">
+      <i class="fa fa-users"></i> Clientes
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="{{ url_for('main.index') }}">
+      <i class="fa fa-arrow-left"></i> Volver al sitio
+    </a>
+  </div>
+</aside>
+
+<div class="admin-main">
+  <div class="admin-topbar">
+    <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+    <div class="admin-user">
+      <div class="admin-avatar">{{ current_user.nombre[0].upper() }}</div>
+      <span>{{ current_user.nombre.split()[0] }}</span>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-bar mt-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category in ['error','danger'] else category }} alert-dismissible mb-2">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="admin-content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

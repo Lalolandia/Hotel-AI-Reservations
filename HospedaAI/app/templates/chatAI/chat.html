@@ -1,8 +1,229 @@
 {% extends "base.html" %}
+{% block title %}Asistente IA — HotelAI{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-    <h2>🤖 Chat Inteligente</h2>
-    <p>Este módulo será implementado próximamente.</p>
+<div style="padding-top: 80px;">
+
+  <!-- Header -->
+  <div class="rooms-page-header">
+    <div class="container">
+      <p class="section-eyebrow">✦ Inteligencia Artificial</p>
+      <h1 class="section-title text-white">Asistente HotelBot</h1>
+      <p style="color:rgba(255,255,255,0.6); font-size:16px; margin-top:8px;">
+        Cuéntame qué buscas y te recomiendo la habitación perfecta
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="chat-layout">
+
+      <!-- ══ PANEL IZQUIERDO: info ══ -->
+      <aside class="chat-sidebar">
+
+        <div class="chat-info-card">
+          <div class="chat-bot-avatar">
+            <i class="fa fa-robot"></i>
+            <div class="bot-status"></div>
+          </div>
+          <h5>HotelBot</h5>
+          <p>Tu asistente personal para encontrar la habitación ideal</p>
+        </div>
+
+        <div class="chat-tips-card">
+          <h6><i class="fa fa-lightbulb"></i> Puedes preguntarme...</h6>
+          <ul>
+            <li onclick="enviarSugerencia(this)">
+              ¿Qué habitación recomiendas para 2 personas?
+            </li>
+            <li onclick="enviarSugerencia(this)">
+              Busco algo romántico con vista al jardín
+            </li>
+            <li onclick="enviarSugerencia(this)">
+              ¿Cuáles son los paquetes disponibles?
+            </li>
+            <li onclick="enviarSugerencia(this)">
+              Viajo con mi familia de 4 personas
+            </li>
+            <li onclick="enviarSugerencia(this)">
+              ¿Cuál es la habitación más económica?
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn-ghost w-100 mt-3" onclick="resetChat()">
+          <i class="fa fa-rotate-left me-2"></i>Nueva conversación
+        </button>
+
+      </aside>
+
+      <!-- ══ PANEL DERECHO: chat ══ -->
+      <div class="chat-main">
+        <div class="chat-window" id="chatWindow">
+
+          <!-- Mensaje de bienvenida -->
+          <div class="chat-msg bot-msg" id="welcomeMsg">
+            <div class="msg-avatar"><i class="fa fa-robot"></i></div>
+            <div class="msg-bubble">
+              <p>¡Hola! 👋 Soy <strong>HotelBot</strong>, tu asistente personal de HotelAI.</p>
+              <p>Estoy aquí para ayudarte a encontrar la habitación perfecta para tu estadía. ¿Me cuentas un poco sobre lo que buscas? Por ejemplo, ¿cuántas personas viajan o qué tipo de experiencia desean? 🏨</p>
+              <span class="msg-time">Ahora</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+          <div class="chat-input-wrapper">
+            <textarea
+              id="chatInput"
+              class="chat-input"
+              placeholder="Escribe tu mensaje aquí..."
+              rows="1"
+              onkeydown="handleKey(event)"
+              oninput="autoResize(this)"
+            ></textarea>
+            <button class="chat-send-btn" id="sendBtn" onclick="enviarMensaje()">
+              <i class="fa fa-paper-plane"></i>
+            </button>
+          </div>
+          <p class="chat-disclaimer">
+            <i class="fa fa-shield-halved"></i>
+            HotelBot usa IA para recomendaciones. Las reservas se confirman en la web.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ── Estado ──────────────────────────────────────────────────────
+  let cargando = false;
+
+  // ── Enviar mensaje ───────────────────────────────────────────────
+  async function enviarMensaje() {
+    const input   = document.getElementById('chatInput');
+    const mensaje = input.value.trim();
+    if (!mensaje || cargando) return;
+
+    input.value = '';
+    autoResize(input);
+    agregarMensaje(mensaje, 'user');
+    mostrarTyping();
+    cargando = true;
+    document.getElementById('sendBtn').disabled = true;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify({ mensaje })
+      });
+      const data = await res.json();
+      quitarTyping();
+
+      if (data.error) {
+        agregarMensaje('Lo siento, ocurrió un error: ' + data.error, 'bot', true);
+      } else {
+        agregarMensaje(data.respuesta, 'bot');
+      }
+    } catch (e) {
+      quitarTyping();
+      agregarMensaje('No pude conectarme. Verifica tu conexión e intenta de nuevo.', 'bot', true);
+    }
+
+    cargando = false;
+    document.getElementById('sendBtn').disabled = false;
+    input.focus();
+  }
+
+  // ── Agregar burbuja ──────────────────────────────────────────────
+  function agregarMensaje(texto, tipo, esError = false) {
+    const window_ = document.getElementById('chatWindow');
+    const div     = document.createElement('div');
+    div.className = `chat-msg ${tipo === 'user' ? 'user-msg' : 'bot-msg'}`;
+
+    const ahora = new Date().toLocaleTimeString('es', {hour:'2-digit', minute:'2-digit'});
+
+    // Convertir saltos de línea y **negrita**
+    let html = texto
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    if (tipo === 'user') {
+      div.innerHTML = `
+        <div class="msg-bubble user-bubble">
+          <p>${html}</p>
+          <span class="msg-time">${ahora}</span>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="msg-avatar ${esError ? 'avatar-error' : ''}">
+          <i class="fa ${esError ? 'fa-triangle-exclamation' : 'fa-robot'}"></i>
+        </div>
+        <div class="msg-bubble ${esError ? 'bubble-error' : ''}">
+          <p>${html}</p>
+          <span class="msg-time">${ahora}</span>
+        </div>`;
+    }
+
+    window_.appendChild(div);
+    window_.scrollTop = window_.scrollHeight;
+  }
+
+  // ── Typing indicator ─────────────────────────────────────────────
+  function mostrarTyping() {
+    const window_ = document.getElementById('chatWindow');
+    const div = document.createElement('div');
+    div.className = 'chat-msg bot-msg';
+    div.id = 'typingIndicator';
+    div.innerHTML = `
+      <div class="msg-avatar"><i class="fa fa-robot"></i></div>
+      <div class="msg-bubble typing-bubble">
+        <span></span><span></span><span></span>
+      </div>`;
+    window_.appendChild(div);
+    window_.scrollTop = window_.scrollHeight;
+  }
+
+  function quitarTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+
+  // ── Sugerencias ──────────────────────────────────────────────────
+  function enviarSugerencia(el) {
+    document.getElementById('chatInput').value = el.textContent.trim();
+    enviarMensaje();
+  }
+
+  // ── Reset conversación ───────────────────────────────────────────
+  async function resetChat() {
+    await fetch('/api/chat/reset', { method: 'POST' });
+    const w = document.getElementById('chatWindow');
+    // Dejar solo el mensaje de bienvenida
+    while (w.children.length > 1) w.removeChild(w.lastChild);
+    document.getElementById('chatInput').focus();
+  }
+
+  // ── Enter para enviar ────────────────────────────────────────────
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      enviarMensaje();
+    }
+  }
+
+  // ── Auto-resize textarea ─────────────────────────────────────────
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+</script>
 {% endblock %}

@@ -1,0 +1,40 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Habitaciones — Admin{% endblock %}
+{% block page_title %}Habitaciones{% endblock %}
+
+{% block content %}
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>{{ habitaciones|length }} habitaciones</h5>
+    <a href="{{ url_for('admin.crear_habitacion') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nueva habitación</a>
+  </div>
+  {% if habitaciones %}
+  <table class="admin-table">
+    <thead>
+      <tr><th>Número</th><th>Tipo</th><th>Piso</th><th>Capacidad</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for h in habitaciones %}
+      <tr>
+        <td><strong>#{{ h.numero }}</strong></td>
+        <td>{{ h.tipo.nombre if h.tipo else '—' }}</td>
+        <td>{{ h.piso or '—' }}</td>
+        <td>{{ h.tipo.capacidad if h.tipo else (h.capacidad or '—') }} persona(s)</td>
+        <td><span class="badge-{{ h.estado }}">{{ h.estado | capitalize }}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a href="{{ url_for('admin.editar_habitacion', id=h.id) }}" class="btn-admin-edit"><i class="fa fa-pen"></i> Editar</a>
+            <form method="POST" action="{{ url_for('admin.eliminar_habitacion', id=h.id) }}" onsubmit="return confirm('¿Eliminar #{{ h.numero }}?')">
+              <button type="submit" class="btn-admin-danger"><i class="fa fa-trash"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:40px;text-align:center;color:#9CA3AF;">No hay habitaciones. <a href="{{ url_for('admin.crear_habitacion') }}" style="color:var(--gold)">Crear la primera</a></div>
+  {% endif %}
+</div>
+{% endblock %}

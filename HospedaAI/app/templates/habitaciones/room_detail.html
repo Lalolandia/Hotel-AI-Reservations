@@ -5,7 +5,6 @@
 <div style="padding-top: 80px;">
   <div class="container py-5">
 
-    <!-- Breadcrumb -->
     <nav class="detail-breadcrumb">
       <a href="{{ url_for('main.index') }}">Inicio</a>
       <i class="fa fa-chevron-right"></i>
@@ -16,22 +15,24 @@
 
     <div class="detail-layout">
 
-      <!-- ══ IZQUIERDA: imagen + info ══ -->
       <div class="detail-main">
 
-        <!-- Imagen principal -->
         <div class="detail-img-container">
-          <div class="detail-img-placeholder">
-            <img src="{{ url_for('static', filename='img/rooms' ~ room.numero ~ '.png') }}"
-                 alt="Habitación {{ room.numero }}"
-                 class="detail-img">
-          </div>
+          {% if room.tipo and room.tipo.imagen %}
+            <img src="{{ room.tipo.imagen }}"
+                 alt="{{ room.tipo.nombre }}"
+                 style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0; border-radius:var(--radius-lg);">
+          {% else %}
+            <div class="detail-img-placeholder">
+              <i class="fa fa-bed"></i>
+              <p>Habitación #{{ room.numero }}</p>
+            </div>
+          {% endif %}
           <span class="room-badge room-badge-{{ room.estado }} detail-badge">
             {{ room.estado | capitalize }}
           </span>
         </div>
 
-        <!-- Título y descripción -->
         <div class="detail-body">
           <div class="detail-title-row">
             <div>
@@ -51,7 +52,6 @@
           <p class="detail-description">{{ room.tipo.descripcion }}</p>
           {% endif %}
 
-          <!-- Características -->
           <div class="detail-features">
             <div class="feature-item">
               <div class="feature-icon"><i class="fa fa-user-group"></i></div>
@@ -83,7 +83,6 @@
             </div>
           </div>
 
-          <!-- Servicios incluidos -->
           <div class="detail-amenities">
             <h5>Servicios incluidos</h5>
             <div class="amenities-list">
@@ -91,14 +90,13 @@
               <span><i class="fa fa-snowflake"></i> Aire acondicionado</span>
               <span><i class="fa fa-tv"></i> Smart TV</span>
               <span><i class="fa fa-mug-saucer"></i> Desayuno incluido</span>
-              <span><i class="fa fa-shirt"></i> Servicio de lavandería</span>
+              <span><i class="fa fa-shirt"></i> Lavandería</span>
               <span><i class="fa fa-car"></i> Estacionamiento</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ DERECHA: reserva ══ -->
       <div class="detail-sidebar">
         <div class="booking-card">
           <div class="booking-card-header">
@@ -108,11 +106,18 @@
 
           {% if room.estado == 'disponible' %}
             {% if current_user.is_authenticated %}
-              <form action="#" method="post" class="booking-form-detail">
+              <form action="{{ url_for('reservas.crear_reserva') }}"
+                    method="GET" class="booking-form-detail" id="bookingForm">
+                <input type="hidden" name="habitacion_id" value="{{ room.id }}">
                 <div class="booking-field-v">
-                  <label><i class="fa fa-calendar"></i> Fechas</label>
-                  <input type="text" name="dates" class="input-luxury date-picker"
-                         placeholder="Check-in → Check-out" required>
+                  <label><i class="fa fa-calendar-plus"></i> Check-in</label>
+                  <input type="date" name="fecha_inicio" id="det_inicio"
+                         class="input-luxury" required onchange="calcDetalle()">
+                </div>
+                <div class="booking-field-v">
+                  <label><i class="fa fa-calendar-minus"></i> Check-out</label>
+                  <input type="date" name="fecha_fin" id="det_fin"
+                         class="input-luxury" required onchange="calcDetalle()">
                 </div>
                 <div class="booking-field-v">
                   <label><i class="fa fa-user-group"></i> Huéspedes</label>
@@ -122,35 +127,35 @@
                     {% endfor %}
                   </select>
                 </div>
+                <div class="precio-resumen" id="detResumen" style="display:none">
+                  <div class="precio-row">
+                    <span id="detDetalle">—</span>
+                    <span class="precio-total" id="detTotal">$0</span>
+                  </div>
+                </div>
                 <button type="submit" class="btn-gold w-100 btn-submit">
-                  <i class="fa fa-calendar-check me-2"></i>Reservar ahora
+                  <i class="fa fa-calendar-check me-2"></i>Confirmar reserva
                 </button>
               </form>
             {% else %}
-              <p class="booking-login-msg">
-                Debes iniciar sesión para reservar esta habitación.
-              </p>
-              <a href="{{ url_for('auth.login', next=request.url) }}"
-                 class="btn-gold w-100 text-center">
+              <p class="booking-login-msg">Inicia sesión para reservar esta habitación.</p>
+              <a href="{{ url_for('auth.login', next=request.url) }}" class="btn-gold w-100 text-center">
                 <i class="fa fa-right-to-bracket me-2"></i>Iniciar sesión
               </a>
-              <a href="{{ url_for('auth.register') }}"
-                 class="btn-ghost w-100 text-center mt-2">
+              <a href="{{ url_for('auth.register') }}" class="btn-ghost w-100 text-center mt-2">
                 Crear cuenta gratis
               </a>
             {% endif %}
-
           {% else %}
             <div class="booking-unavailable">
               <i class="fa fa-circle-xmark"></i>
-              <p>Esta habitación no está disponible en este momento.</p>
+              <p>Esta habitación no está disponible.</p>
             </div>
             <a href="{{ url_for('main.rooms') }}" class="btn-gold w-100 text-center">
               Ver otras habitaciones
             </a>
           {% endif %}
 
-          <!-- Info adicional -->
           <div class="booking-perks">
             <div><i class="fa fa-rotate-left"></i> Cancelación gratuita</div>
             <div><i class="fa fa-shield-halved"></i> Pago seguro</div>
@@ -158,18 +163,42 @@
           </div>
         </div>
 
-        <!-- IA sugerencia -->
         <div class="ai-suggest-card">
           <i class="fa fa-robot"></i>
           <div>
             <strong>¿Tienes dudas?</strong>
-            <p>Nuestro asistente IA puede ayudarte a elegir.</p>
+            <p>El asistente IA puede ayudarte.</p>
           </div>
-          <a href="{{ url_for('main.chat') }}" class="btn-ghost">Chatear</a>
+          <a href="{{ url_for('chat.chat') }}" class="btn-ghost">Chatear</a>
         </div>
-
       </div>
+
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const precioNoche = {{ room.tipo.precio_noche | float if room.tipo else 0 }};
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('det_inicio').min = today;
+
+  function calcDetalle() {
+    const inicio  = document.getElementById('det_inicio').value;
+    const fin     = document.getElementById('det_fin').value;
+    const resumen = document.getElementById('detResumen');
+    if (!inicio || !fin) { resumen.style.display = 'none'; return; }
+    const d1 = new Date(inicio);
+    document.getElementById('det_fin').min =
+      new Date(d1.getTime() + 86400000).toISOString().split('T')[0];
+    const noches = Math.round((new Date(fin) - d1) / (1000*60*60*24));
+    if (noches <= 0) { resumen.style.display = 'none'; return; }
+    const total = noches * precioNoche;
+    document.getElementById('detDetalle').textContent =
+      `$${precioNoche.toFixed(2)} × ${noches} noche${noches > 1 ? 's' : ''}`;
+    document.getElementById('detTotal').textContent = `$${total.toFixed(2)}`;
+    resumen.style.display = 'block';
+  }
+</script>
 {% endblock %}

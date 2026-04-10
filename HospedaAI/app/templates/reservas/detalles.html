@@ -1,69 +1,118 @@
 {% extends "base.html" %}
+{% block title %}Reserva #{{ reserva.id }} — HotelAI{% endblock %}
 
 {% block content %}
-<section class="crud-page">
-    <div class="container">
-        <div class="crud-form-card">
+<div style="padding-top: 80px;">
+  <div class="container py-5">
 
-            <div class="crud-form-header">
-                <p class="section-eyebrow">Gestion hotelera</p>
-                <h1 class="section-title">Detalle de reserva</h1>
-                <p class="crud-subtitle">
-                    Información completa de la reserva seleccionada.
-                </p>
-            </div>
+    <nav class="detail-breadcrumb">
+      <a href="{{ url_for('main.index') }}">Inicio</a>
+      <i class="fa fa-chevron-right"></i>
+      <a href="{{ url_for('reservas.listar_reservas') }}">Mis reservas</a>
+      <i class="fa fa-chevron-right"></i>
+      <span>Reserva #{{ reserva.id }}</span>
+    </nav>
 
-            <div class="crud-form">
+    <div class="reserva-layout">
 
-                <div class="form-group-luxury">
-                    <label>ID</label>
-                    <p>#{{ reserva.id }}</p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Cliente</label>
-                    <p>
-                        {{ reserva.cliente.nombre if reserva.cliente else "N/A" }}
-                    </p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Habitación</label>
-                    <p>
-                        Habitación {{ reserva.habitacion.numero if reserva.habitacion else "N/A" }}
-                    </p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Tipo de habitación</label>
-                    <p>
-                        {{ reserva.habitacion.tipo.nombre if reserva.habitacion and reserva.habitacion.tipo else "N/A" }}
-                    </p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Fecha inicio</label>
-                    <p>{{ reserva.fecha_inicio }}</p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Fecha fin</label>
-                    <p>{{ reserva.fecha_fin }}</p>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Total</label>
-                    <p class="text-success fw-bold">${{ reserva.total }}</p>
-                </div>
-
-                <div class="crud-form-actions">
-                    <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">
-                        Volver
-                    </a>
-                </div>
-
-            </div>
+      <!-- Detalle principal -->
+      <div class="crud-form-card">
+        <div class="crud-form-header">
+          <p class="section-eyebrow">✦ Reserva #{{ reserva.id }}</p>
+          <h1 class="section-title">Detalle de reserva</h1>
         </div>
+
+        <div class="detalle-grid">
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-user"></i> Cliente</span>
+            <span class="detalle-val">{{ reserva.cliente.nombre if reserva.cliente else '—' }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-envelope"></i> Correo</span>
+            <span class="detalle-val">{{ reserva.cliente.correo if reserva.cliente else '—' }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-bed"></i> Habitación</span>
+            <span class="detalle-val">
+              #{{ reserva.habitacion.numero if reserva.habitacion else '—' }}
+              — {{ reserva.habitacion.tipo.nombre if reserva.habitacion and reserva.habitacion.tipo else '' }}
+            </span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-layer-group"></i> Piso</span>
+            <span class="detalle-val">{{ reserva.habitacion.piso if reserva.habitacion else '—' }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-calendar-plus"></i> Check-in</span>
+            <span class="detalle-val">{{ reserva.fecha_inicio.strftime('%d de %B, %Y') }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-calendar-minus"></i> Check-out</span>
+            <span class="detalle-val">{{ reserva.fecha_fin.strftime('%d de %B, %Y') }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <span class="detalle-label"><i class="fa fa-moon"></i> Noches</span>
+            <span class="detalle-val">{{ noches }} noche{{ 's' if noches != 1 else '' }}</span>
+          </div>
+
+          <div class="detalle-item detalle-total">
+            <span class="detalle-label"><i class="fa fa-dollar-sign"></i> Total</span>
+            <span class="detalle-val precio-total-detalle">${{ reserva.total }}</span>
+          </div>
+
+        </div>
+
+        <div class="crud-form-actions mt-4">
+          <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">
+            <i class="fa fa-arrow-left me-2"></i>Volver
+          </a>
+
+          <!-- Cancelar como POST — seguro -->
+          <form method="POST"
+                action="{{ url_for('reservas.cancelar_reserva', id=reserva.id) }}"
+                onsubmit="return confirm('¿Estás seguro que deseas cancelar esta reserva?')">
+            <button type="submit" class="btn-logout">
+              <i class="fa fa-xmark me-2"></i>Cancelar reserva
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Sidebar resumen -->
+      <div class="reserva-sidebar">
+        <div class="booking-card">
+          <div class="booking-card-header">
+            <span class="price-amount">${{ reserva.total }}</span>
+          </div>
+          <div class="booking-perks">
+            <div>
+              <i class="fa fa-calendar"></i>
+              {{ noches }} noche{{ 's' if noches != 1 else '' }}
+            </div>
+            <div>
+              <i class="fa fa-user-group"></i>
+              Capacidad: {{ reserva.habitacion.tipo.capacidad if reserva.habitacion and reserva.habitacion.tipo else '—' }} persona(s)
+            </div>
+            <div>
+              <i class="fa fa-door-open"></i>
+              Habitación #{{ reserva.habitacion.numero if reserva.habitacion else '—' }}
+            </div>
+            <div>
+              <i class="fa fa-layer-group"></i>
+              Piso {{ reserva.habitacion.piso if reserva.habitacion else '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-</section>
+  </div>
+</div>
 {% endblock %}

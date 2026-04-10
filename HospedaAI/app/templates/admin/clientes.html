@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Clientes — Admin{% endblock %}
+{% block page_title %}Clientes registrados{% endblock %}
+
+{% block content %}
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>{{ clientes|length }} clientes registrados</h5>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Verificado</th><th>Rol</th><th>Reservas</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;flex-shrink:0;">{{ c.nombre[0].upper() }}</div>
+            <div>
+              <strong>{{ c.nombre }}</strong>
+              {% if c.id == current_user.id %}<span style="font-size:11px;color:#9CA3AF">(tú)</span>{% endif %}
+            </div>
+          </div>
+        </td>
+        <td style="color:#6B7280">{{ c.correo }}</td>
+        <td>{{ c.telefono or '—' }}</td>
+        <td>
+          {% if c.correo_confirmado %}
+            <span style="color:#059669"><i class="fa fa-circle-check"></i> Sí</span>
+          {% else %}
+            <span style="color:#EF4444"><i class="fa fa-circle-xmark"></i> No</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.es_admin %}
+            <span class="badge-admin"><i class="fa fa-shield-halved"></i> Admin</span>
+          {% else %}
+            <span class="badge-normal">Cliente</span>
+          {% endif %}
+        </td>
+        <td>{{ c.reservas|length }}</td>
+        <td>
+          {% if c.id != current_user.id %}
+          <form method="POST" action="{{ url_for('admin.toggle_admin', id=c.id) }}">
+            <button type="submit" class="btn-admin-ghost" style="font-size:12px;padding:5px 10px;">
+              {% if c.es_admin %}<i class="fa fa-user-minus"></i> Quitar admin{% else %}<i class="fa fa-user-shield"></i> Hacer admin{% endif %}
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

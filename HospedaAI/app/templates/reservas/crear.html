@@ -1,52 +1,184 @@
 {% extends "base.html" %}
+{% block title %}Crear reserva — HotelAI{% endblock %}
 
 {% block content %}
-<section class="crud-page">
-    <div class="container">
-        <div class="crud-form-card">
-            <div class="crud-form-header">
-                <p class="section-eyebrow">Gestion hotelera</p>
-                <h1 class="section-title">Crear reserva</h1>
-                <p class="crud-subtitle">Selecciona los datos para registrar una nueva reserva.</p>
-            </div>
+<div style="padding-top: 80px;">
+  <div class="container py-5">
 
-            <form method="POST" class="crud-form">
-                <div class="form-group-luxury">
-                    <label>Cliente</label>
-                    <select name="cliente_id" class="input-luxury select-luxury" required>
-                        {% for c in clientes %}
-                        <option value="{{ c.id }}">{{ c.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+    <nav class="detail-breadcrumb">
+      <a href="{{ url_for('main.index') }}">Inicio</a>
+      <i class="fa fa-chevron-right"></i>
+      <a href="{{ url_for('reservas.listar_reservas') }}">Mis reservas</a>
+      <i class="fa fa-chevron-right"></i>
+      <span>Nueva reserva</span>
+    </nav>
 
-                <div class="form-group-luxury">
-                    <label>Habitación</label>
-                    <select name="habitacion_id" class="input-luxury select-luxury" required>
-                        {% for h in habitaciones %}
-                        <option value="{{ h.id }}">
-                            Habitación {{ h.numero }} - ${{ h.tipo.precio_noche }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+    <div class="reserva-layout">
 
-                <div class="form-group-luxury">
-                    <label>Fecha inicio</label>
-                    <input type="date" name="fecha_inicio" class="input-luxury" required>
-                </div>
-
-                <div class="form-group-luxury">
-                    <label>Fecha fin</label>
-                    <input type="date" name="fecha_fin" class="input-luxury" required>
-                </div>
-
-                <div class="crud-form-actions">
-                    <button class="btn-gold" type="submit">Guardar reserva</button>
-                    <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">Cancelar</a>
-                </div>
-            </form>
+      <!-- Formulario -->
+      <div class="crud-form-card">
+        <div class="crud-form-header">
+          <p class="section-eyebrow">✦ Gestión hotelera</p>
+          <h1 class="section-title">Nueva reserva</h1>
+          <p class="crud-subtitle">Completa los datos para registrar tu reserva.</p>
         </div>
+
+        <form method="POST" class="crud-form" id="reservaForm">
+
+          <div class="form-group-luxury">
+            <label><i class="fa fa-bed"></i> Habitación</label>
+            <select name="habitacion_id" id="habitacion_id"
+                    class="input-luxury select-luxury" required
+                    onchange="actualizarPrecio()">
+              <option value="">Selecciona una habitación</option>
+              {% for h in habitaciones %}
+              <option value="{{ h.id }}"
+                      data-precio="{{ h.tipo.precio_noche if h.tipo else 0 }}"
+                      data-nombre="{{ h.tipo.nombre if h.tipo else '' }}"
+                      data-capacidad="{{ h.tipo.capacidad if h.tipo else '' }}"
+                      {{ 'selected' if habitacion_id_pre == h.id }}>
+                Hab. {{ h.numero }} — {{ h.tipo.nombre if h.tipo else '' }}
+                (Piso {{ h.piso or '—' }}, ${{ h.tipo.precio_noche if h.tipo else '—' }}/noche)
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Info de habitación seleccionada -->
+          <div class="habitacion-info" id="habitacionInfo" style="display:none">
+            <div class="hab-info-grid">
+              <div><i class="fa fa-tag"></i> <strong id="habNombre">—</strong></div>
+              <div><i class="fa fa-user-group"></i> Capacidad: <strong id="habCapacidad">—</strong></div>
+              <div><i class="fa fa-dollar-sign"></i> <strong id="habPrecio">—</strong> / noche</div>
+            </div>
+          </div>
+
+          <div class="form-row-two">
+            <div class="form-group-luxury">
+              <label><i class="fa fa-calendar-plus"></i> Fecha de entrada</label>
+              <input type="date" name="fecha_inicio" id="fecha_inicio"
+                     class="input-luxury" required
+                     min="{{ today }}"
+                     value="{{ fecha_inicio_pre }}"
+                     onchange="calcularTotal()">
+            </div>
+            <div class="form-group-luxury">
+              <label><i class="fa fa-calendar-minus"></i> Fecha de salida</label>
+              <input type="date" name="fecha_fin" id="fecha_fin"
+                     class="input-luxury" required
+                     value="{{ fecha_fin_pre }}"
+                     onchange="calcularTotal()">
+            </div>
+          </div>
+
+          <!-- Resumen de precio -->
+          <div class="precio-resumen" id="precioResumen" style="display:none">
+            <div class="precio-row">
+              <span id="precioDetalle">— × — noches</span>
+              <span class="precio-total" id="precioTotal">$0.00</span>
+            </div>
+          </div>
+
+          <div class="crud-form-actions">
+            <button class="btn-gold" type="submit">
+              <i class="fa fa-calendar-check me-2"></i>Confirmar reserva
+            </button>
+            <a href="{{ url_for('reservas.listar_reservas') }}" class="btn-ghost">
+              Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Panel lateral info -->
+      <div class="reserva-sidebar">
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <i class="fa fa-circle-info"></i>
+            <h4>Información</h4>
+          </div>
+          <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:12px;">
+            <li style="font-size:14px; color:var(--muted); display:flex; gap:10px;">
+              <i class="fa fa-circle-check" style="color:var(--gold); margin-top:2px;"></i>
+              Solo se muestran habitaciones disponibles.
+            </li>
+            <li style="font-size:14px; color:var(--muted); display:flex; gap:10px;">
+              <i class="fa fa-circle-check" style="color:var(--gold); margin-top:2px;"></i>
+              El total se calcula automáticamente por noches.
+            </li>
+            <li style="font-size:14px; color:var(--muted); display:flex; gap:10px;">
+              <i class="fa fa-circle-check" style="color:var(--gold); margin-top:2px;"></i>
+              Puedes cancelar antes de la fecha de entrada.
+            </li>
+          </ul>
+        </div>
+
+        <div class="ai-suggest-card mt-3">
+          <i class="fa fa-robot"></i>
+          <div>
+            <strong>¿Necesitas ayuda?</strong>
+            <p>El asistente IA puede recomendarte la mejor habitación.</p>
+          </div>
+          <a href="{{ url_for('chat.chat') }}" class="btn-ghost">Chatear</a>
+        </div>
+      </div>
+
     </div>
-</section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('fecha_inicio').min = today;
+
+  function actualizarPrecio() {
+    const sel = document.getElementById('habitacion_id');
+    const opt = sel.options[sel.selectedIndex];
+    const info = document.getElementById('habitacionInfo');
+
+    if (opt.value) {
+      document.getElementById('habNombre').textContent    = opt.dataset.nombre;
+      document.getElementById('habCapacidad').textContent = opt.dataset.capacidad + ' persona(s)';
+      document.getElementById('habPrecio').textContent    = '$' + opt.dataset.precio;
+      info.style.display = 'block';
+    } else {
+      info.style.display = 'none';
+    }
+    calcularTotal();
+  }
+
+  function calcularTotal() {
+    const sel    = document.getElementById('habitacion_id');
+    const opt    = sel.options[sel.selectedIndex];
+    const inicio = document.getElementById('fecha_inicio').value;
+    const fin    = document.getElementById('fecha_fin').value;
+    const resumen = document.getElementById('precioResumen');
+
+    if (!opt.value || !inicio || !fin) { resumen.style.display = 'none'; return; }
+
+    const d1 = new Date(inicio), d2 = new Date(fin);
+    const noches = Math.round((d2 - d1) / (1000*60*60*24));
+
+    if (noches <= 0) { resumen.style.display = 'none'; return; }
+
+    const precio = parseFloat(opt.dataset.precio);
+    const total  = noches * precio;
+
+    document.getElementById('precioDetalle').textContent =
+      `$${precio.toFixed(2)} × ${noches} noche${noches > 1 ? 's' : ''}`;
+    document.getElementById('precioTotal').textContent = `$${total.toFixed(2)}`;
+    resumen.style.display = 'block';
+
+    // fecha_fin mínima = fecha_inicio + 1
+    document.getElementById('fecha_fin').min =
+      new Date(d1.getTime() + 86400000).toISOString().split('T')[0];
+  }
+
+  // Si viene con habitación preseleccionada, actualizar info
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('habitacion_id').value) actualizarPrecio();
+  });
+</script>
 {% endblock %}

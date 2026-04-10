@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Reservas — Admin{% endblock %}
+{% block page_title %}Todas las reservas{% endblock %}
+
+{% block content %}
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>{{ reservas|length }} reservas en total</h5>
+  </div>
+  {% if reservas %}
+  <table class="admin-table">
+    <thead>
+      <tr><th>ID</th><th>Cliente</th><th>Habitación</th><th>Check-in</th><th>Check-out</th><th>Noches</th><th>Total</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for r in reservas %}
+      {% set noches = (r.fecha_fin - r.fecha_inicio).days %}
+      <tr>
+        <td>#{{ r.id }}</td>
+        <td>
+          <strong>{{ r.cliente.nombre if r.cliente else '—' }}</strong>
+          {% if r.cliente %}<p style="font-size:12px;color:#9CA3AF;margin:0">{{ r.cliente.correo }}</p>{% endif %}
+        </td>
+        <td>
+          #{{ r.habitacion.numero if r.habitacion else '—' }}
+          {% if r.habitacion and r.habitacion.tipo %}<p style="font-size:12px;color:#9CA3AF;margin:0">{{ r.habitacion.tipo.nombre }}</p>{% endif %}
+        </td>
+        <td>{{ r.fecha_inicio }}</td>
+        <td>{{ r.fecha_fin }}</td>
+        <td>{{ noches }}</td>
+        <td style="font-weight:600;color:#059669">${{ r.total }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin.eliminar_reserva', id=r.id) }}" onsubmit="return confirm('¿Eliminar reserva #{{ r.id }}?')">
+            <button type="submit" class="btn-admin-danger"><i class="fa fa-trash"></i></button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:40px;text-align:center;color:#9CA3AF;">No hay reservas.</div>
+  {% endif %}
+</div>
+{% endblock %}

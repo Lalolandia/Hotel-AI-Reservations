@@ -1,7 +1,8 @@
 # app/routes/main.py
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from app.models import Habitacion, Paquete
 from app.models.tipo_habitacion import TipoHabitacion
+from datetime import date
 
 main = Blueprint('main', __name__)
 
@@ -14,7 +15,6 @@ def index():
 
 @main.route('/rooms')
 def rooms():
-    # Filtros
     capacidad  = request.args.get('personas', 0, type=int)
     tipo_id    = request.args.get('tipo', 0, type=int)
     precio_max = request.args.get('precio_max', 0, type=int)
@@ -23,10 +23,8 @@ def rooms():
 
     if capacidad > 0:
         query = query.filter(TipoHabitacion.capacidad >= capacidad)
-
     if tipo_id > 0:
         query = query.filter(Habitacion.tipo_id == tipo_id)
-
     if precio_max > 0:
         query = query.filter(TipoHabitacion.precio_noche <= precio_max)
 
@@ -47,22 +45,19 @@ def room_detail(room_id):
     return render_template('habitaciones/room_detail.html', room=room)
 
 
-
 @main.route('/packages')
 def packages():
     packages = Paquete.query.all()
-    return render_template('packages.html', packages=packages)
+    return render_template('habitaciones/Packages.html', packages=packages)
 
 
 @main.route('/search')
 def search():
-    q       = request.args.get('q', '')
-    people  = request.args.get('people', 1, type=int)
-    # Redirige a /rooms con el filtro de personas aplicado
-    from flask import redirect, url_for
+    people = request.args.get('people', 1, type=int)
     return redirect(url_for('main.rooms', personas=people))
 
 
-@main.route('/chat')
-def chat():
-    return render_template('chatAI/chat.html')
+# Inyectar fecha de hoy en todos los templates
+@main.app_context_processor
+def inject_today():
+    return {'now': date.today().strftime('%Y-%m-%d')}

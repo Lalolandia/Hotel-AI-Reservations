@@ -1,0 +1,79 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard — Admin HotelAI{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#FEF3C7;color:#D97706"><i class="fa fa-calendar-check"></i></div>
+      <div class="stat-num">{{ total_reservas }}</div>
+      <div class="stat-label">Reservas totales</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#D1FAE5;color:#059669"><i class="fa fa-dollar-sign"></i></div>
+      <div class="stat-num">${{ "%.0f"|format(ingresos) }}</div>
+      <div class="stat-label">Ingresos totales</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#DBEAFE;color:#2563EB"><i class="fa fa-users"></i></div>
+      <div class="stat-num">{{ total_clientes }}</div>
+      <div class="stat-label">Clientes registrados</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#EDE9FE;color:#7C3AED"><i class="fa fa-bed"></i></div>
+      <div class="stat-num">{{ disponibles }}/{{ total_habitaciones }}</div>
+      <div class="stat-label">Habitaciones disponibles</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="admin-table-card p-4">
+      <h6 style="font-size:13px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Acciones rápidas</h6>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{{ url_for('admin.crear_tipo') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nuevo tipo</a>
+        <a href="{{ url_for('admin.crear_habitacion') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nueva habitación</a>
+        <a href="{{ url_for('admin.crear_paquete') }}" class="btn-admin-gold"><i class="fa fa-plus"></i> Nuevo paquete</a>
+        <a href="{{ url_for('admin.listar_reservas') }}" class="btn-admin-ghost"><i class="fa fa-list"></i> Ver reservas</a>
+        <a href="{{ url_for('admin.listar_clientes') }}" class="btn-admin-ghost"><i class="fa fa-users"></i> Ver clientes</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-table-card">
+  <div class="admin-table-header">
+    <h5>Reservas recientes</h5>
+    <a href="{{ url_for('admin.listar_reservas') }}" class="btn-admin-ghost">Ver todas</a>
+  </div>
+  {% if reservas_recientes %}
+  <table class="admin-table">
+    <thead>
+      <tr><th>ID</th><th>Cliente</th><th>Habitación</th><th>Check-in</th><th>Check-out</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+      {% for r in reservas_recientes %}
+      <tr>
+        <td>#{{ r.id }}</td>
+        <td>{{ r.cliente.nombre if r.cliente else '—' }}</td>
+        <td>{{ r.habitacion.numero if r.habitacion else '—' }}</td>
+        <td>{{ r.fecha_inicio }}</td>
+        <td>{{ r.fecha_fin }}</td>
+        <td style="font-weight:600;color:#059669">${{ r.total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:40px;text-align:center;color:#9CA3AF;">No hay reservas aún.</div>
+  {% endif %}
+</div>
+{% endblock %}

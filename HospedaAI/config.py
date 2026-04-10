@@ -20,3 +20,4 @@ class Config:
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT") or "other-secret-salt"
     RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'onboarding@resend.dev')
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
